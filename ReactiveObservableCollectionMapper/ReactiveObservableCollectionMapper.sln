@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveObservableCollectionMapper", "ReactiveObservableCollectionMapper.csproj", "{C4DBB381-095E-45DA-8AD9-12C95A85801B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveObservableCollectionMapper.Test", "..\ReactiveObservableCollectionMapper.Test\ReactiveObservableCollectionMapper.Test.csproj", "{19865270-B2DD-4A46-8142-6064B04587BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4DBB381-095E-45DA-8AD9-12C95A85801B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4DBB381-095E-45DA-8AD9-12C95A85801B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4DBB381-095E-45DA-8AD9-12C95A85801B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4DBB381-095E-45DA-8AD9-12C95A85801B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19865270-B2DD-4A46-8142-6064B04587BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19865270-B2DD-4A46-8142-6064B04587BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19865270-B2DD-4A46-8142-6064B04587BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19865270-B2DD-4A46-8142-6064B04587BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C4DBB381-095E-45DA-8AD9-12C95A85801B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ReactiveObservableCollectionMapper</RootNamespace>
+    <AssemblyName>ReactiveObservableCollectionMapper</AssemblyName>
+    <DefaultLanguage>ja-JP</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <CodeContractsAssemblyMode>1</CodeContractsAssemblyMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
+    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
+    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
+    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
+    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
+    <CodeContractsRedundantTests>True</CodeContractsRedundantTests>
+    <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
+    <CodeContractsInferRequires>True</CodeContractsInferRequires>
+    <CodeContractsInferEnsures>False</CodeContractsInferEnsures>
+    <CodeContractsInferObjectInvariants>False</CodeContractsInferObjectInvariants>
+    <CodeContractsSuggestAssumptions>False</CodeContractsSuggestAssumptions>
+    <CodeContractsSuggestRequires>False</CodeContractsSuggestRequires>
+    <CodeContractsSuggestObjectInvariants>False</CodeContractsSuggestObjectInvariants>
+    <CodeContractsSuggestReadonly>True</CodeContractsSuggestReadonly>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
+    <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
+    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
+    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
+    <CodeContractsCustomRewriterAssembly />
+    <CodeContractsCustomRewriterClass />
+    <CodeContractsLibPaths />
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsSQLServerOption />
+    <CodeContractsBaseLineFile />
+    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
+    <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
+    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsReferenceAssembly>DoNotBuild</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>2</CodeContractsAnalysisWarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
+    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
+    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
+    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
+    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
+    <CodeContractsRedundantTests>True</CodeContractsRedundantTests>
+    <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
+    <CodeContractsInferRequires>True</CodeContractsInferRequires>
+    <CodeContractsInferEnsures>False</CodeContractsInferEnsures>
+    <CodeContractsInferObjectInvariants>False</CodeContractsInferObjectInvariants>
+    <CodeContractsSuggestAssumptions>False</CodeContractsSuggestAssumptions>
+    <CodeContractsSuggestRequires>False</CodeContractsSuggestRequires>
+    <CodeContractsSuggestObjectInvariants>False</CodeContractsSuggestObjectInvariants>
+    <CodeContractsSuggestReadonly>True</CodeContractsSuggestReadonly>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
+    <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
+    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
+    <CodeContractsEmitXMLDocs>True</CodeContractsEmitXMLDocs>
+    <CodeContractsCustomRewriterAssembly />
+    <CodeContractsCustomRewriterClass />
+    <CodeContractsLibPaths />
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsSQLServerOption />
+    <CodeContractsBaseLineFile />
+    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
+    <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
+    <CodeContractsRuntimeCheckingLevel>Preconditions</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>2</CodeContractsAnalysisWarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CompositeTag.cs" />
+    <Compile Include="Debug\DebugSetting.cs" />
+    <Compile Include="Debug\ObservableCollectionSource.Map.Internal.cs" />
+    <Compile Include="ICollectionStatuses.cs" />
+    <Compile Include="ICollectionStatusesAttached.cs" />
+    <Compile Include="IConnectableCollectionStatuses.cs" />
+    <Compile Include="IGroupedCollectionStatuses.cs" />
+    <Compile Include="Impl\Abort\AbortException.cs" />
+    <Compile Include="Impl\AnonymousCollectionStatuses.cs" />
+    <Compile Include="Impl\CollectionBasedCollectionStatuses.cs" />
+    <Compile Include="Impl\CollectionStatuses.cs" />
+    <Compile Include="Impl\Connectable\AnonymousConnectableCollectionStatuses.cs" />
+    <Compile Include="Impl\Connectable\AnonymousConnectableObservable.cs" />
+    <Compile Include="Impl\Connectable\ConnectableCollectionStatuses.cs" />
+    <Compile Include="Impl\DelegationCollectionStatuses.cs" />
+    <Compile Include="Impl\DelegationCollectionStatuses2.cs" />
+    <Compile Include="Impl\Grouped\AnonymousGroupedCollectionStatuses.cs" />
+    <Compile Include="Impl\Grouped\AnonymousGroupedObservable.cs" />
+    <Compile Include="Impl\Grouped\GroupedCollectionStatuses.cs" />
+    <Compile Include="Impl\OrderedCollectionStatuses.cs" />
+    <Compile Include="Impl\OrderingComparers\CompositeOrderingComparer.cs" />
+    <Compile Include="Impl\OrderingComparers\IOrderingComparer.cs" />
+    <Compile Include="Impl\OrderingComparers\OrderingComparer.cs" />
+    <Compile Include="Impl\Producers\AnyProducer.cs" />
+    <Compile Include="Impl\Producers\BasicCombineProducer.cs" />
+    <Compile Include="Impl\Producers\Box.cs" />
+    <Compile Include="Impl\Producers\CastProducer.cs" />
+    <Compile Include="Impl\Producers\CombineLatestProducer.cs" />
+    <Compile Include="Impl\Producers\CombineProducer.cs" />
+    <Compile Include="Impl\Producers\CountProducer.cs" />
+    <Compile Include="Impl\Producers\DistinctProducer.cs" />
+    <Compile Include="Impl\Producers\ExceptProducer.cs" />
+    <Compile Include="Impl\Producers\FillValuesIfEmptyProducer.cs" />
+    <Compile Include="Impl\Producers\FlattenProducer.cs" />
+    <Compile Include="Impl\Producers\GroupByProducer.cs" />
+    <Compile Include="Impl\Producers\GroupJoinProducer.cs" />
+    <Compile Include="Impl\Producers\IntersectProducer.cs" />
+    <Compile Include="Impl\Producers\JoinProducer.cs" />
+    <Compile Include="Impl\Producers\OnItemsAddedOrRemovedProducer.cs" />
+    <Compile Include="Impl\Producers\OrderProducer.cs" />
+    <Compile Include="Impl\Producers\Producer.cs" />
+    <Compile Include="Impl\Producers\ProducerObservable.cs" />
+    <Compile Include="Impl\Producers\ProducerObservable_T.cs" />
+    <Compile Include="Impl\Producers\ProducerObserver.cs" />
+    <Compile Include="Impl\Producers\ReverseProducer.cs" />
+    <Compile Include="Impl\Producers\SelectProducer.cs" />
+    <Compile Include="Impl\Producers\SimplifyProducer.cs" />
+    <Compile Include="Impl\Producers\SkipProducer.cs" />
+    <Compile Include="Impl\Producers\SlimBasicCombineProducer.cs" />
+    <Compile Include="Impl\Producers\SlimCombineProducer.cs" />
+    <Compile Include="Impl\Producers\TakeProducer.cs" />
+    <Compile Include="Impl\Producers\WhereSelectProducer.cs" />
+    <Compile Include="Impl\RecommendedEvent.cs" />
+    <Compile Include="Impl\RecommendedEventType.cs" />
+    <Compile Include="Impl\ReverseCollectionStatuses.cs" />
+    <Compile Include="Impl\SelectCollectionStatuses.cs" />
+    <Compile Include="Impl\SelectManyCollectionStatuses.cs" />
+    <Compile Include="Impl\SkipAndTakeCollectionStatuses.cs" />
+    <Compile Include="Impl\Subjects\PublishSubject.cs" />
+    <Compile Include="Impl\Subjects\PublishSubjectCore.cs" />
+    <Compile Include="Impl\Subjects\SimplePublishSubject.cs" />
+    <Compile Include="Impl\Subjects\SimplePublishSubjectCore.cs" />
+    <Compile Include="Impl\Subjects\SlimPublishSubject.cs" />
+    <Compile Include="Impl\Subjects\SlimPublishSubjectCore.cs" />
+    <Compile Include="Impl\Subjects\SlimSimplePublishSubject.cs" />
+    <Compile Include="Impl\Subjects\SlimSimplePublishSubjectCore.cs" />
+    <Compile Include="Impl\Subjects\SubjectBase.cs" />
+    <Compile Include="Impl\WhereCollectionStatuses.cs" />
+    <Compile Include="Impl\WhereSelectCollectionStatuses.cs" />
+    <Compile Include="IOrderedCollectionStatuses.cs" />
+    <Compile Include="ModifySupport.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SchedulingAndThreading.cs" />
+    <Compile Include="SimpleNotifyCollectionChangedEvents\AddOrRemoveUnit.cs" />
+    <Compile Include="SimpleNotifyCollectionChangedEvents\SimpleNotifyCollectionChangedEvent.cs" />
+    <Compile Include="SimpleNotifyCollectionChangedEvents\SimpleNotifyCollectionChangedEventAction.cs" />
+    <Compile Include="SlimNotifyCollectionChangedEvents\SlimAdded.cs" />
+    <Compile Include="SlimNotifyCollectionChangedEvents\SlimInitialState.cs" />
+    <Compile Include="SlimNotifyCollectionChangedEvents\SlimMoved.cs" />
+    <Compile Include="SlimNotifyCollectionChangedEvents\SlimNotifyCollectionChangedEvent.cs" />
+    <Compile Include="SlimNotifyCollectionChangedEvents\SlimNotifyCollectionChangedEvent_T.cs" />
+    <Compile Include="SlimNotifyCollectionChangedEvents\SlimRemoved.cs" />
+    <Compile Include="SlimNotifyCollectionChangedEvents\SlimReplaced.cs" />
+    <Compile Include="SlimNotifyCollectionChangedEvents\SlimReset.cs" />
+    <Compile Include="SlimSimpleNotifyCollectionChangedEvents\SimpleNotifyCollectionChangedEventAction.cs" />
+    <Compile Include="SlimSimpleNotifyCollectionChangedEvents\SlimAddedOrRemovedUnit.cs" />
+    <Compile Include="SlimSimpleNotifyCollectionChangedEvents\SlimSimpleNotifyCollectionChangedEvent.cs" />
+    <Compile Include="Subjects\CurrentStateBehaviorSubject.cs" />
+    <Compile Include="Subjects\ICollectionStatusesSubject.cs" />
+    <Compile Include="Subjects\NotifyCollectionChangedEventSubject.cs" />
+    <Compile Include="Subjects\ObservableCollectionSourceSubject.cs" />
+    <Compile Include="Support\AddedOrRemovedUnitSet.cs" />
+    <Compile Include="Support\Converters.cs" />
+    <Compile Include="Support\EventAttached.cs" />
+    <Compile Include="Support\EventsConverter.cs" />
+    <Compile Include="Support\Exceptions.cs" />
+    <Compile Include="Support\Extensions.ApplyEventsToCollection.cs" />
+    <Compile Include="Support\Extensions.Check.cs" />
+    <Compile Include="Support\Extensions.Collection.cs" />
+    <Compile Include="Support\Extensions.ConvertEvents.cs" />
+    <Compile Include="Support\Extensions.Others.cs" />
+    <Compile Include="Support\Extractors\DefaultEventExtractor.cs" />
+    <Compile Include="Support\Extractors\ISimpleNotifyCollectionChangedEventExtractor.cs" />
+    <Compile Include="Support\Extractors\SimpleNotifyCollectionChangedEventExtractor.cs" />
+    <Compile Include="Support\Inspect.cs" />
+    <Compile Include="Support\LightWands.cs" />
+    <Compile Include="Support\Reference.cs" />
+    <Compile Include="Tagged.cs" />
+    <Compile Include="ValueOrEmpty.cs" />
+    <Compile Include="_Exceptions\InvalidInformationException.cs" />
+    <Compile Include="_Exceptions\InvalidInformationExceptionType.cs" />
+    <Compile Include="_Exceptions\InvalidInformationException_T.cs" />
+    <Compile Include="_FriendAssemblies.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.Connectable.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.Connectable.Internal.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.Factory.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.FromEnumerable.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.FromObservable.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.FromObservable.Internal.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.Map.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.Map.Internal.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.OrderBy.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.Subscription.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.ThenBy.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.ToCollection.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.ToInstance.Internal.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.ToSingleValues.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.ToSingleValues.Internal.cs" />
+    <Compile Include="_MainMethods\CollectionStatuses.ToSource.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\IAdded.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\IInitialState.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\IMoved.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\Impl\Added.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\Impl\InitialState.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\Impl\Moved.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\Impl\NotifyCollectionChangedEvent.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\Impl\Removed.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\Impl\Replaced.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\Impl\Reset.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\INotifyCollectionChangedEvent.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\IRemoved.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\IReplaced.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\IReset.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\NotifyCollectionChangedEvent.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\NotifyCollectionChangedEventAction.cs" />
+    <Compile Include="_NotifyCollectionChangedEvent\NotifyCollectionChangedEventSet.cs" />
+    <Compile Include="_ObservableCollection\ErrorEventArgs.cs" />
+    <Compile Include="_ObservableCollection\GeneratedObservableCollection.cs" />
+    <Compile Include="_ObservableCollection\IGeneratedObservableCollection.cs" />
+    <Compile Include="_ObservableCollection\MultiValuesObservableCollection.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Reactive.Core">
+      <HintPath>packages\Rx-Core.2.2.5\lib\portable-net45+winrt45+wp8+wpa81\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>packages\Rx-Interfaces.2.2.5\lib\portable-net45+winrt45+wp8+wpa81\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>packages\Rx-Linq.2.2.5\lib\portable-net45+winrt45+wp8+wpa81\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
