@@ -32,3 +32,9 @@ ReadOnlyObservableCollection<string> observableCollection =
     .ObserveOn(synchronizationContext)
     .ToObservableCollection();
 ```
+
+License
+-------
+MIT License.
+
+for details, please see License.txt
