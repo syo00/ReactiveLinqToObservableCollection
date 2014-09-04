@@ -33,6 +33,18 @@ ReadOnlyObservableCollection<string> observableCollection =
     .ToObservableCollection();
 ```
 
+Requirements
+------------
+You need Reactive extensions - Query library (Rx-Linq) and its dependent libraries.
+
+Targets
+-------
+This library is portable. Targets are:
+* .NET Framework 4.5
+* Windows 8
+* Windows Phone 8.1
+* Windows Phone Silverlight 8
+
 License
 -------
 MIT License.
