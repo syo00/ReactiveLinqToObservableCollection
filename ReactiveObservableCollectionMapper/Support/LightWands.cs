@@ -22,7 +22,7 @@
 
 /***** public or internal *****/
 // NOTE: uncomment the following line to make LightWands class internal.
-//#define USE_INTERNAL
+#define USE_INTERNAL
 
 
 /***** targeting projects *****/
