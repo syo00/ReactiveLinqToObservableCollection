@@ -110,8 +110,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CompositeTag.cs" />
-    <Compile Include="Debug\DebugSetting.cs" />
-    <Compile Include="Debug\ObservableCollectionSource.Map.Internal.cs" />
+    <Compile Include="%40Debug\DebugSetting.cs" />
+    <Compile Include="%40Debug\ObservableCollectionSource.Map.Internal.cs" />
     <Compile Include="ICollectionStatuses.cs" />
     <Compile Include="ICollectionStatusesAttached.cs" />
     <Compile Include="IConnectableCollectionStatuses.cs" />

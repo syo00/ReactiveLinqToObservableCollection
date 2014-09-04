@@ -79,7 +79,7 @@ namespace Kirinji.LinqToObservableCollection
             Contract.Requires<ArgumentNullException>(onNext != null);
             Contract.Requires<ArgumentNullException>(onCompleted != null);
             Contract.Requires<ArgumentNullException>(token != null);
-
+            
             source.InitialStateAndChanged.Subscribe(onNext, onCompleted, token);
         }
 

@@ -24,12 +24,12 @@ namespace Kirinji.LinqToObservableCollection.Support
         /// <summary>Checks the observable sequences are synchronized. It is faster than Synchronize().</summary>
         public static IObservable<T> CheckSynchronization<T>(this IObservable<T> source)
         {
-            if (Debug.DebugSetting.DisableCheckSynchronization == Debug.CheckSynchronizationType.Disable)
+            if (Debug.DebugSetting.CheckSynchronization == Debug.CheckSynchronizationType.Disable)
             {
                 return source;
             }
 
-            if (Debug.DebugSetting.DisableCheckSynchronization == Debug.CheckSynchronizationType.Synchronization)
+            if (Debug.DebugSetting.CheckSynchronization == Debug.CheckSynchronizationType.Synchronization)
             {
                 return source.Synchronize();
             }
