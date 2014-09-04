@@ -35,7 +35,7 @@ ReadOnlyObservableCollection<string> observableCollection =
     .ToObservableCollection(); // ToObservableCollection() creates ReadOnlyObservableCollection
 
 // (ReadOnly)ObservableCollection -> IObservable
-IObservable<int> count =
+IObservable<int> count = observableCollection
     .ToStatuses()
     .Where(str => str != null && str.Length >= 5)
     .Count();  // Count() returns IObservable<int>
