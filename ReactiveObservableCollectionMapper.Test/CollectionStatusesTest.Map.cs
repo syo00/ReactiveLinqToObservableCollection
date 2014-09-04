@@ -982,8 +982,13 @@ namespace Kirinji.LinqToObservableCollection.Test
 
                 innerSubject.OnNext(NotifyCollectionChangedEvent.CreateResetEvent(new[] { "kailua", "smooooch" })); // ["kailua", "smooooch"], ["sakura mirage+smooooch", "sakura luminance+smooooch"]
                 // valuesHistory.Single().Reset.NewItems.Is("sakura mirage+smooooch", "sakura luminance+smooooch");
-                // Flatten の影響で Replaced として流れてくる
-                // ToDo: 流れてくる Event をきれいにしてテストコードを書く
+                valuesHistory[0].Replaced.OldItems.Is("sakura mirage+s!ck", "sakura mirage+sigsig");
+                valuesHistory[0].Replaced.NewItems.Is("sakura mirage+smooooch");
+                valuesHistory[1].Replaced.OldItems.Is("sakura luminance+s!ck", "sakura luminance+sigsig");
+                valuesHistory[1].Replaced.NewItems.Is("sakura luminance+smooooch");
+                valuesHistory.Count.Is(2);
+                // Flatten の影響で 2 つの Replaced として流れてくる
+                // 1 つの Replaced や Reset でも可
                 valuesHistory.Clear();
 
                 outerSubject.OnCompleted();
