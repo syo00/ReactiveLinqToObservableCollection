@@ -41,7 +41,7 @@ IObservable<int> count =
     .Count();  // Count() returns IObservable<int>
 ```
 
-In additional, you can use some of useful reactive extensions methods such as **ObserveOn**, **SubscribeOn**, **Synchronize**, and etc. They make very easy to change ObservableCollection handling thread and synchronize.
+In additional, you can use some of useful Reactive Extensions methods such as **ObserveOn**, **SubscribeOn**, **Synchronize**. They make very easy to change ObservableCollection handling thread and synchronize.
 
 ```csharp
 ObservableCollection<string> observableCollection = ...;
