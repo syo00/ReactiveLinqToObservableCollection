@@ -2,11 +2,11 @@ Reactive ObservableCollection Mapper
 ====================================
 With Reactive ObservableCollection Mapper, you can convert a ObservableCollection/ReadOnlyObservableCollection into new ReadOnlyObservableCollection like LINQ to objects.
 
-This project is still in beta and may change name usage of methods.
+This project is still in beta and may change name or usage of methods.
 
 QuickStart
 ----------
-write **using Kirinji.LinqToObservableCollection**.
+At first, write **using Kirinji.LinqToObservableCollection**.
  
 ```csharp
 ObservableCollection<string> observableCollection = ...; // create or get ObservableCollection. you can also use ReadOnlyObservableCollection
@@ -20,7 +20,7 @@ ReadOnlyObservableCollection<string> observableCollection =
 
 When items in source collection are changed, the changes will be applied to the converted collection.
 
-In additional, you can use some of useful reactive extensions methods such as ObserveOn and Synchronize. They make very easy to handle  ObservableCollection thread and synchronization.
+In additional, you can use some of useful reactive extensions methods such as ObserveOn and Synchronize. They make very easy to change ObservableCollection handling thread and synchronize.
 
 ```csharp
 ObservableCollection<string> observableCollection = ...;
@@ -47,6 +47,6 @@ This library is portable. Targets are:
 
 License
 -------
-MIT License.
+Released under MIT License.
 
-for details, please see License.txt
+For details, please see License.txt
