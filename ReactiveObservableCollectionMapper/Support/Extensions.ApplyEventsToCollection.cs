@@ -651,16 +651,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                                 }
 
                                 collection.RemoveAt(i.Index);
-
-                                if (i.Item == null)
-                                {
-                                    result.Add(new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Remove, removing, i.Index));
-                                }
-                                else
-                                {
-                                    result.Add(i);
-                                }
-
+                                result.Add(new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Remove, removing, i.Index));
                             }
                         }
 

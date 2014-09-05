@@ -247,7 +247,8 @@ namespace Kirinji.LinqToObservableCollection.Support
         private void InsertCore(int index, AddedOrRemovedUnit<T> item)
         {
             Contract.Requires<ArgumentNullException>(item != null);
-            Contract.Requires<ArgumentOutOfRangeException>(0 <= index && index <= Count);
+            Contract.Requires<ArgumentOutOfRangeException>(0 <= index);
+            Contract.Requires<ArgumentOutOfRangeException>(index <= Count);
 
             int insertingItemIndex = item.Index;
 

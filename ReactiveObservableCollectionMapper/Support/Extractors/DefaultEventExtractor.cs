@@ -160,6 +160,7 @@ namespace Kirinji.LinqToObservableCollection.Support.Extractors
             return true;
         }
 
+        [ContractVerification(false)] // ignores warnings of .ToArray().ToReadOnly()
         static INotifyCollectionChangedEvent<TTo> Select<TFrom, TTo>(INotifyCollectionChangedEvent<TFrom> source, Func<TFrom, TTo> converter)
         {
             Contract.Requires<ArgumentNullException>(source != null);

@@ -31,7 +31,7 @@ namespace Kirinji.LinqToObservableCollection.SlimSimpleNotifyCollectionChangedEv
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(item != null);
+            Contract.Invariant(item != null || Type == SlimAddOrRemoveUnitType.Remove);
         }
 
         public SlimAddOrRemoveUnitType Type { get; private set; }

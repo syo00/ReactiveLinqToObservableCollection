@@ -37,6 +37,8 @@ namespace Kirinji.LinqToObservableCollection
 
         public int IndexOf(INotifyCollectionChangedEvent<T> item)
         {
+            Contract.Requires<ArgumentNullException>(item != null);
+
             return items.FirstIndex(reference => reference.Value == item) ?? -1;
         }
 
@@ -99,6 +101,9 @@ namespace Kirinji.LinqToObservableCollection
 
         public void RemoveAt(int index)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(Count > index);
+
             var item = this[index];
             
             switch (item.Action)
@@ -331,10 +336,14 @@ namespace Kirinji.LinqToObservableCollection
         {
             get
             {
+                Contract.Ensures(Contract.Result<INotifyCollectionChangedEvent<T>>() != null);
+
                 return items[index].Value;
             }
             set
             {
+                Contract.Requires<ArgumentNullException>(value != null);
+
                 RemoveAt(index);
                 Insert(index, value);
             }
@@ -342,6 +351,8 @@ namespace Kirinji.LinqToObservableCollection
 
         public void Add(INotifyCollectionChangedEvent<T> item)
         {
+            Contract.Requires<ArgumentNullException>(item != null);
+
             Insert(Count, item);
         }
 

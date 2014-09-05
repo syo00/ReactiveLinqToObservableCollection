@@ -112,6 +112,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             }
 
             var leftResult = left.ToList();
+            Contract.Assume(leftResult != null);
             removingLeftItemIndexes.AsEnumerable().Reverse().ForEach(leftResult.RemoveAt);
             return new Tuple<IReadOnlyList<T>, IReadOnlyList<T>>(leftResult.ToReadOnly(), rightResult.ToReadOnly());
         }

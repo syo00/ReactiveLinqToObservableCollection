@@ -172,7 +172,7 @@ namespace Kirinji.LinqToObservableCollection.SimpleNotifyCollectionChangedEvents
             Contract.Requires<ArgumentNullException>(moved != null);
             Contract.Ensures(Contract.Result<SimpleNotifyCollectionChangedEvent<T>>() != null);
 
-            if (moved.OldStartingIndex < 0 || moved.NewStartingIndex < 0)
+            if (moved.OldStartingIndex < 0)
             {
                 throw new InvalidInformationException<T>(InvalidInformationExceptionType.NotSupportedIndex);
             }

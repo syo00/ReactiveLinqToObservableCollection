@@ -52,6 +52,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Connectable
                                 connecting = null;
                             }
                         });
+                    Contract.Assume(connecting != null);
                     return connecting;
                 }
 

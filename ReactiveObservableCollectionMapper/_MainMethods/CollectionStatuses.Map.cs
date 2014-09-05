@@ -74,7 +74,6 @@ namespace Kirinji.LinqToObservableCollection
         public static ICollectionStatuses<T> Distinct<T>(this ICollectionStatuses<T> source, IEqualityComparer<T> comparer)
         {
             Contract.Requires<ArgumentNullException>(source != null);
-            Contract.Requires<ArgumentNullException>(comparer != null);
             Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
 
             return ProducerObservable.Create(() => new DistinctProducer<T>(source.ToInstance(), comparer ?? EqualityComparer<T>.Default))

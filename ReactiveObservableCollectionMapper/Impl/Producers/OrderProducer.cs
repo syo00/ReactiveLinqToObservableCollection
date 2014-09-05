@@ -66,6 +66,8 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
 
         private int FindInsertingIndex(T value)
         {
+            Contract.Ensures(Contract.Result<int>() >= 0);
+
             var source = ordered.Select(x => x.Value).ToArray().ToReadOnly();
 
             var leftIndex = 0;
@@ -74,6 +76,8 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             while (true)
             {
                 int comparingIndex = (leftIndex + rightIndex) / 2;
+                Contract.Assume(comparingIndex >= 0);
+
                 if (leftIndex == rightIndex)
                 {
                     return comparingIndex;
