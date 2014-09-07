@@ -16,7 +16,7 @@ using Kirinji.LinqToObservableCollection.SlimSimpleNotifyCollectionChangedEvents
 namespace Kirinji.LinqToObservableCollection.Impl.Producers
 {
     [ContractClass(typeof(SlimBasicCombineProducerContract<,,>))]
-    abstract class SlimBasicCombineProducer<TSource1, TSource2, T> : Producer<SlimSimpleNotifyCollectionChangedEvent<T>>
+    abstract class SlimBasicCombineProducer<TSource1, TSource2, T> : Producer<T>
     {
         readonly CollectionStatuses<TSource1> leftSource;
         readonly CollectionStatuses<TSource2> rightSource;
@@ -39,9 +39,9 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             this.schedulingAndThreading = schedulingAndThreading;
         }
 
-        protected abstract IEnumerable<SlimSimpleNotifyCollectionChangedEvent<T>> ConvertLeftEvent(SlimSimpleNotifyCollectionChangedEvent<TSource1> e);
+        protected abstract IEnumerable<T> ConvertLeftEvent(SlimSimpleNotifyCollectionChangedEvent<TSource1> e);
 
-        protected abstract IEnumerable<SlimSimpleNotifyCollectionChangedEvent<T>> ConvertRightEvent(SlimSimpleNotifyCollectionChangedEvent<TSource2> e);
+        protected abstract IEnumerable<T> ConvertRightEvent(SlimSimpleNotifyCollectionChangedEvent<TSource2> e);
 
         protected IReadOnlyList<Tagged<TSource1>> LeftCollection
         {
@@ -93,7 +93,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
 
         }
 
-        protected sealed override IDisposable SubscribeCore(ProducerObserver<SlimSimpleNotifyCollectionChangedEvent<T>> observer)
+        protected sealed override IDisposable SubscribeCore(ProducerObserver<T> observer)
         {
             var mergedStream =
                 leftSource
@@ -123,7 +123,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
                 {
                     x.Action(leftEvent =>
                         {
-                            var newNextEvents = ConvertLeftEvent(leftEvent).Where(e => e != null).ToArray();
+                            var newNextEvents = ConvertLeftEvent(leftEvent).ToArray();
 
                             if (leftEvent.Action == SlimSimpleNotifyCollectionChangedEventAction.InitialState)
                             {
@@ -134,7 +134,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
                             newNextEvents.ForEach(observer.OnNext);
                         }, rightEvent =>
                         {
-                            var newNextEvents = ConvertRightEvent(rightEvent).Where(e => e != null).ToArray();
+                            var newNextEvents = ConvertRightEvent(rightEvent).ToArray();
 
                             if (rightEvent.Action == SlimSimpleNotifyCollectionChangedEventAction.InitialState)
                             {
@@ -157,18 +157,18 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<SlimSimpleNotifyCollectionChangedEvent<T>> ConvertLeftEvent(SlimSimpleNotifyCollectionChangedEvent<TSource1> e)
+        protected override IEnumerable<T> ConvertLeftEvent(SlimSimpleNotifyCollectionChangedEvent<TSource1> e)
         {
             Contract.Requires<ArgumentNullException>(e != null);
-            Contract.Ensures(Contract.Result<IEnumerable<SlimSimpleNotifyCollectionChangedEvent<T>>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<SlimSimpleNotifyCollectionChangedEvent<T>> ConvertRightEvent(SlimSimpleNotifyCollectionChangedEvent<TSource2> e)
+        protected override IEnumerable<T> ConvertRightEvent(SlimSimpleNotifyCollectionChangedEvent<TSource2> e)
         {
             Contract.Requires<ArgumentNullException>(e != null);
-            Contract.Ensures(Contract.Result<IEnumerable<SlimSimpleNotifyCollectionChangedEvent<T>>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
             throw new NotImplementedException();
         }

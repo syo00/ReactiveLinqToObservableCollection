@@ -25,6 +25,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
         readonly Lazy<IObservable<SlimNotifyCollectionChangedEvent<T>>> slimInitialStateAndChanged;
         readonly Lazy<IObservable<SimpleNotifyCollectionChangedEvent<T>>> simpleInitialStateAndChanged;
         readonly Lazy<IObservable<SlimSimpleNotifyCollectionChangedEvent<T>>> slimSimpleInitialStateAndChanged;
+        readonly Lazy<IObservable<NotifyCollectionChangedEventObject<T>>> eventsAsEventObject;
 
         public CollectionStatuses()
         {
@@ -32,8 +33,21 @@ namespace Kirinji.LinqToObservableCollection.Impl
             this.slimInitialStateAndChanged = new Lazy<IObservable<SlimNotifyCollectionChangedEvent<T>>>(() => CreateSlimInitialStateAndChanged());
             this.simpleInitialStateAndChanged = new Lazy<IObservable<SimpleNotifyCollectionChangedEvent<T>>>(() => CreateSimpleInitialStateAndChanged());
             this.slimSimpleInitialStateAndChanged = new Lazy<IObservable<SlimSimpleNotifyCollectionChangedEvent<T>>>(() => CreateSlimSimpleInitialStateAndChanged());
+            this.eventsAsEventObject = new Lazy<IObservable<NotifyCollectionChangedEventObject<T>>>(() => CreateEventsAsEventObject());
             this.toObservableCollection
                 = new Lazy<GeneratedObservableCollection<T>>(() => new GeneratedObservableCollection<T>(this));
+        }
+
+        [ContractInvariantMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(toObservableCollection != null);
+            Contract.Invariant(initialStateAndChanged != null);
+            Contract.Invariant(slimInitialStateAndChanged != null);
+            Contract.Invariant(simpleInitialStateAndChanged != null);
+            Contract.Invariant(slimSimpleInitialStateAndChanged != null);
+            Contract.Invariant(eventsAsEventObject != null);
         }
 
         public IObservable<INotifyCollectionChangedEvent<T>> InitialStateAndChanged
@@ -42,7 +56,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
             {
                 Contract.Ensures(Contract.Result<IObservable<INotifyCollectionChangedEvent<T>>>() != null);
 
-                var result = initialStateAndChanged.Value ?? Observable.Empty<INotifyCollectionChangedEvent<T>>();
+                var result = initialStateAndChanged.Value;
                 Contract.Assume(result != null);
                 return result;
             }
@@ -54,7 +68,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
             {
                 Contract.Ensures(Contract.Result<IObservable<SlimNotifyCollectionChangedEvent<T>>>() != null);
 
-                var result = slimInitialStateAndChanged.Value ?? Observable.Empty<SlimNotifyCollectionChangedEvent<T>>();
+                var result = slimInitialStateAndChanged.Value;
                 Contract.Assume(result != null);
                 return result;
             }
@@ -66,7 +80,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
             {
                 Contract.Ensures(Contract.Result<IObservable<SimpleNotifyCollectionChangedEvent<T>>>() != null);
 
-                var result = simpleInitialStateAndChanged.Value ?? Observable.Empty<SimpleNotifyCollectionChangedEvent<T>>();
+                var result = simpleInitialStateAndChanged.Value;
                 Contract.Assume(result != null);
                 return result;
             }
@@ -78,7 +92,19 @@ namespace Kirinji.LinqToObservableCollection.Impl
             {
                 Contract.Ensures(Contract.Result<IObservable<SlimSimpleNotifyCollectionChangedEvent<T>>>() != null);
 
-                var result = slimSimpleInitialStateAndChanged.Value ?? Observable.Empty<SlimSimpleNotifyCollectionChangedEvent<T>>();
+                var result = slimSimpleInitialStateAndChanged.Value;
+                Contract.Assume(result != null);
+                return result;
+            }
+        }
+
+        public IObservable<NotifyCollectionChangedEventObject<T>> EventsAsEventObject
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IObservable<NotifyCollectionChangedEventObject<T>>>() != null);
+
+                var result = eventsAsEventObject.Value;
                 Contract.Assume(result != null);
                 return result;
             }
@@ -102,6 +128,32 @@ namespace Kirinji.LinqToObservableCollection.Impl
             Contract.Ensures(Contract.Result<IObservable<SimpleNotifyCollectionChangedEvent<T>>>() != null);
 
             return CreateSlimSimpleInitialStateAndChanged().ExtractFromSlim();
+        }
+
+        protected virtual IObservable<NotifyCollectionChangedEventObject<T>> CreateEventsAsEventObject()
+        {
+            Contract.Ensures(Contract.Result<IObservable<NotifyCollectionChangedEventObject<T>>>() != null);
+
+            if (RecommendedEvent.RecommendedEventType == RecommendedEventType.SlimOne)
+            {
+                return SlimInitialStateAndChanged
+                    .Select(e => new NotifyCollectionChangedEventObject<T>(e));
+            }
+
+            if (RecommendedEvent.RecommendedEventType == RecommendedEventType.SimpleOne)
+            {
+                return SimpleInitialStateAndChanged
+                    .Select(e => new NotifyCollectionChangedEventObject<T>(e));
+            }
+
+            if (RecommendedEvent.RecommendedEventType == RecommendedEventType.SlimSimpleOne)
+            {
+                return SlimSimpleInitialStateAndChanged
+                    .Select(e => new NotifyCollectionChangedEventObject<T>(e));
+            }
+
+            return InitialStateAndChanged
+                    .Select(e => new NotifyCollectionChangedEventObject<T>(e));
         }
 
         public virtual GeneratedObservableCollection<T> ToObservableCollection()
@@ -183,6 +235,14 @@ namespace Kirinji.LinqToObservableCollection.Impl
             Contract.Ensures(Contract.Result<IObservable<SlimSimpleNotifyCollectionChangedEvent<T>>>() != null);
 
             throw new NotImplementedException();
+        }
+
+        public override RecommendedEvent RecommendedEvent
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Kirinji.LinqToObservableCollection.Impl.Producers
 {
     [ContractClass(typeof(SlimCombineProducerContract<,,>))]
-    abstract class SlimCombineProducer<TSource1, TSource2, T> : SlimBasicCombineProducer<TSource1, TSource2, T>
+    abstract class SlimCombineProducer<TSource1, TSource2, T> : SlimBasicCombineProducer<TSource1, TSource2, SlimSimpleNotifyCollectionChangedEvent<T>>
     {
         protected SlimCombineProducer(CollectionStatuses<TSource1> leftSource, CollectionStatuses<TSource2> rightSource, IReadOnlyCollection<SchedulingAndThreading> schedulingAndThreading)
             : base(leftSource, rightSource, schedulingAndThreading)

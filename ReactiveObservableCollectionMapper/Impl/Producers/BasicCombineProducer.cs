@@ -15,7 +15,7 @@ using Kirinji.LinqToObservableCollection.Impl.Subjects;
 namespace Kirinji.LinqToObservableCollection.Impl.Producers
 {
     [ContractClass(typeof(BasicCombineProducerContract<,,>))]
-    abstract class BasicCombineProducer<TSource1, TSource2, T> : Producer<SimpleNotifyCollectionChangedEvent<T>>
+    abstract class BasicCombineProducer<TSource1, TSource2, T> : Producer<T>
     {
         readonly CollectionStatuses<TSource1> leftSource;
         readonly CollectionStatuses<TSource2> rightSource;
@@ -38,9 +38,9 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             this.schedulingAndThreading = schedulingAndThreading;
         }
 
-        protected abstract IEnumerable<SimpleNotifyCollectionChangedEvent<T>> ConvertLeftEvent(SimpleNotifyCollectionChangedEvent<TSource1> e);
+        protected abstract IEnumerable<T> ConvertLeftEvent(SimpleNotifyCollectionChangedEvent<TSource1> e);
 
-        protected abstract IEnumerable<SimpleNotifyCollectionChangedEvent<T>> ConvertRightEvent(SimpleNotifyCollectionChangedEvent<TSource2> e);
+        protected abstract IEnumerable<T> ConvertRightEvent(SimpleNotifyCollectionChangedEvent<TSource2> e);
 
         protected IReadOnlyList<Tagged<TSource1>> LeftCollection
         {
@@ -92,7 +92,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
 
         }
 
-        protected sealed override IDisposable SubscribeCore(ProducerObserver<SimpleNotifyCollectionChangedEvent<T>> observer)
+        protected sealed override IDisposable SubscribeCore(ProducerObserver<T> observer)
         {
             var mergedStream =
                 leftSource
@@ -122,7 +122,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
                 {
                     x.Action(leftEvent =>
                         {
-                            var newNextEvents = ConvertLeftEvent(leftEvent).Where(e => e != null).ToArray();
+                            var newNextEvents = ConvertLeftEvent(leftEvent).ToArray();
 
                             if (leftEvent.Action == SimpleNotifyCollectionChangedEventAction.InitialState)
                             {
@@ -133,7 +133,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
                             newNextEvents.ForEach(observer.OnNext);
                         }, rightEvent =>
                         {
-                            var newNextEvents = ConvertRightEvent(rightEvent).Where(e => e != null).ToArray();
+                            var newNextEvents = ConvertRightEvent(rightEvent).ToArray();
 
                             if (rightEvent.Action == SimpleNotifyCollectionChangedEventAction.InitialState)
                             {
@@ -156,18 +156,18 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<SimpleNotifyCollectionChangedEvent<T>> ConvertLeftEvent(SimpleNotifyCollectionChangedEvent<TSource1> e)
+        protected override IEnumerable<T> ConvertLeftEvent(SimpleNotifyCollectionChangedEvent<TSource1> e)
         {
             Contract.Requires<ArgumentNullException>(e != null);
-            Contract.Ensures(Contract.Result<IEnumerable<SimpleNotifyCollectionChangedEvent<T>>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<SimpleNotifyCollectionChangedEvent<T>> ConvertRightEvent(SimpleNotifyCollectionChangedEvent<TSource2> e)
+        protected override IEnumerable<T> ConvertRightEvent(SimpleNotifyCollectionChangedEvent<TSource2> e)
         {
             Contract.Requires<ArgumentNullException>(e != null);
-            Contract.Ensures(Contract.Result<IEnumerable<SimpleNotifyCollectionChangedEvent<T>>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
             throw new NotImplementedException();
         }
