@@ -112,6 +112,14 @@ namespace Kirinji.LinqToObservableCollection
             return new AnonymousCollectionStatuses<T>(source);
         }
 
+        internal static CollectionStatuses<T> ToStatuses<T>(this IObservable<NotifyCollectionChangedEventObject<T>> source, RecommendedEvent recommendedEvent)
+        {
+            Contract.Requires<ArgumentNullException>(source != null);
+            Contract.Ensures(Contract.Result<CollectionStatuses<T>>() != null);
+
+            return new AnonymousEventObjectCollectionStatuses<T>(source, recommendedEvent);
+        }
+
         internal static ConnectableCollectionStatuses<T> ToStatuses<T>(this IConnectableObservable<INotifyCollectionChangedEvent<T>> source, bool checkConsistency = false)
         {
             Contract.Requires<ArgumentNullException>(source != null);

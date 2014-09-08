@@ -15,14 +15,18 @@ namespace Kirinji.LinqToObservableCollection
         /// <summary>Not received InitialState first, or received InitialState twice.</summary>
         NotFollowingEventSequenceRule = 1,
 
-        /// <summary>Received <c>INotifyCollectionChangedEvent&lt;T&gt;</c> is null.</summary>
+        /// <summary>Received event is null.</summary>
         EventIsNull = 2,
 
-        /// <summary>Received <c>INotifyCollectionChangedEvent&lt;T&gt;</c> index is not correct.</summary>
-        InvalidIndex = 3,
+        /// <summary>Failed converting event from <c>NotifyCollectionChangedEventObject</c>.</summary>
+        InvalidEventType = 3,
 
-        /// <summary>Received <c>INotifyCollectionChangedEvent&lt;T&gt;</c> item is not correct, especially in case of missing removing, moving, or replacing items equality.</summary>
-        InvalidItem = 4,
+
+        /// <summary>Received event index is not correct.</summary>
+        InvalidIndex = 10,
+
+        /// <summary>Received event item is not correct, especially in case of missing removing, moving, or replacing items equality.</summary>
+        InvalidItem = 11,
 
 
         NotSupportedIndex = 20,

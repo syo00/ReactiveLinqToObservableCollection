@@ -118,6 +118,7 @@
     <Compile Include="IGroupedCollectionStatuses.cs" />
     <Compile Include="Impl\Abort\AbortException.cs" />
     <Compile Include="Impl\AnonymousCollectionStatuses.cs" />
+    <Compile Include="Impl\AnonymousEventObjectCollectionStatuses.cs" />
     <Compile Include="Impl\CollectionBasedCollectionStatuses.cs" />
     <Compile Include="Impl\CollectionStatuses.cs" />
     <Compile Include="Impl\Connectable\AnonymousConnectableCollectionStatuses.cs" />
