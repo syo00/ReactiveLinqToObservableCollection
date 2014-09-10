@@ -29,20 +29,26 @@ namespace Kirinji.LinqToObservableCollection.Impl
         Subject<SlimSimpleNotifyCollectionChangedEvent<T>> slimSimpleNotifyCollectionChangedEventSubject;
         readonly Func<TCollection> collectionCreator;
         readonly Func<TTaggedCollection> taggedCollectionCreator;
+        readonly SynchronizationChecker synchronizationChecker = new SynchronizationChecker();
+
+        public DelegationCollectionStatuses(CollectionStatuses<T> source, Func<TCollection> collectionCreator)
+            : this(source, collectionCreator, null, () => { }, _ => { }, () => { })
+        {
+            Contract.Requires<ArgumentNullException>(source != null);
+            Contract.Requires<ArgumentNullException>(collectionCreator != null);
+        }
 
         public DelegationCollectionStatuses(CollectionStatuses<T> source, Func<TCollection> collectionCreator, Func<TTaggedCollection> taggedCollectionCreator)
             : this(source, collectionCreator, taggedCollectionCreator, () => { }, _ => { }, () => { })
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(collectionCreator != null);
-            Contract.Requires<ArgumentNullException>(taggedCollectionCreator != null);
         }
 
         public DelegationCollectionStatuses(CollectionStatuses<T> source, Func<TCollection> collectionCreator, Func<TTaggedCollection> taggedCollectionCreator, Action onInitialStateArrived, Action<Exception> onError, Action onCompleted)
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(collectionCreator != null);
-            Contract.Requires<ArgumentNullException>(taggedCollectionCreator != null);
             Contract.Requires<ArgumentNullException>(onInitialStateArrived != null);
             Contract.Requires<ArgumentNullException>(onError != null);
             Contract.Requires<ArgumentNullException>(onCompleted != null);
@@ -84,21 +90,29 @@ namespace Kirinji.LinqToObservableCollection.Impl
                             .SlimInitialStateAndChanged
                             .UseObserver((observer, e) =>
                                 {
+                                    synchronizationChecker.Start();
                                     try
                                     {
-                                        CurrentCollection.ApplySlimChangeEvent(e);
-                                    }
-                                    catch (InvalidInformationException<T> ex)
-                                    {
-                                        observer.OnError(ex);
-                                    }
+                                        try
+                                        {
+                                            CurrentCollection.ApplySlimChangeEvent(e);
+                                        }
+                                        catch (InvalidInformationException<T> ex)
+                                        {
+                                            observer.OnError(ex);
+                                        }
 
-                                    observer.OnNext(e);
+                                        observer.OnNext(e);
 
-                                    if (e.Action == NotifyCollectionChangedEventAction.InitialState)
+                                        if (e.Action == NotifyCollectionChangedEventAction.InitialState)
+                                        {
+                                            isInitialStateArrived = true;
+                                            onInitialStateArrived();
+                                        }
+                                    }
+                                    finally
                                     {
-                                        isInitialStateArrived = true;
-                                        onInitialStateArrived();
+                                        synchronizationChecker.End();
                                     }
                                 })
                             .Subscribe(slimNotifyCollectionChangedEventSubject.OnNext, subscribedOnError, subscribedOnCompleted);
@@ -109,26 +123,41 @@ namespace Kirinji.LinqToObservableCollection.Impl
                         simpleNotifyCollectionChangedEventSubject = new Subject<SimpleNotifyCollectionChangedEvent<T>>();
                         subscribedOnError += simpleNotifyCollectionChangedEventSubject.OnError;
                         subscribedOnCompleted += simpleNotifyCollectionChangedEventSubject.OnCompleted;
-                        CreateCurrentTaggedCollection();
+                        CreateCurrentTaggedCollectionOrCurrentCollection();
                         subscriptions = source
                             .SimpleInitialStateAndChanged
                             .UseObserver((observer, e) =>
                             {
+                                synchronizationChecker.Start();
                                 try
                                 {
-                                    CurrentTaggedCollection.ApplySimpleChangeEvent(e);
-                                }
-                                catch (InvalidInformationException<T> ex)
-                                {
-                                    observer.OnError(ex);
-                                }
+                                    try
+                                    {
+                                        if (CurrentTaggedCollection == null)
+                                        {
+                                            CurrentCollection.ApplySimpleChangeEventWithoutTag(e);
+                                        }
+                                        else
+                                        {
+                                            CurrentTaggedCollection.ApplySimpleChangeEvent(e);
+                                        }
+                                    }
+                                    catch (InvalidInformationException<T> ex)
+                                    {
+                                        observer.OnError(ex);
+                                    }
 
-                                observer.OnNext(e);
+                                    observer.OnNext(e);
 
-                                if (e.Action == SimpleNotifyCollectionChangedEventAction.InitialState)
+                                    if (e.Action == SimpleNotifyCollectionChangedEventAction.InitialState)
+                                    {
+                                        isInitialStateArrived = true;
+                                        onInitialStateArrived();
+                                    }
+                                }
+                                finally
                                 {
-                                    isInitialStateArrived = true;
-                                    onInitialStateArrived();
+                                    synchronizationChecker.End();
                                 }
                             })
                             .Subscribe(simpleNotifyCollectionChangedEventSubject.OnNext, subscribedOnError, subscribedOnCompleted);
@@ -139,26 +168,41 @@ namespace Kirinji.LinqToObservableCollection.Impl
                         slimSimpleNotifyCollectionChangedEventSubject = new Subject<SlimSimpleNotifyCollectionChangedEvent<T>>();
                         subscribedOnError += slimSimpleNotifyCollectionChangedEventSubject.OnError;
                         subscribedOnCompleted += slimSimpleNotifyCollectionChangedEventSubject.OnCompleted;
-                        CreateCurrentTaggedCollection();
+                        CreateCurrentTaggedCollectionOrCurrentCollection();
                         subscriptions = source
                             .SlimSimpleInitialStateAndChanged
                             .UseObserver((observer, e) =>
                             {
+                                synchronizationChecker.Start();
                                 try
                                 {
-                                    CurrentTaggedCollection.ApplySlimSimpleChangeEvent(e);
-                                }
-                                catch (InvalidInformationException<T> ex)
-                                {
-                                    observer.OnError(ex);
-                                }
+                                    try
+                                    {
+                                        if (CurrentTaggedCollection == null)
+                                        {
+                                            CurrentCollection.ApplySlimSimpleChangeEventWithoutTag(e);
+                                        }
+                                        else
+                                        {
+                                            CurrentTaggedCollection.ApplySlimSimpleChangeEvent(e);
+                                        }
+                                    }
+                                    catch (InvalidInformationException<T> ex)
+                                    {
+                                        observer.OnError(ex);
+                                    }
 
-                                observer.OnNext(e);
+                                    observer.OnNext(e);
 
-                                if (e.Action == SlimSimpleNotifyCollectionChangedEventAction.InitialState)
+                                    if (e.Action == SlimSimpleNotifyCollectionChangedEventAction.InitialState)
+                                    {
+                                        isInitialStateArrived = true;
+                                        onInitialStateArrived();
+                                    }
+                                }
+                                finally
                                 {
-                                    isInitialStateArrived = true;
-                                    onInitialStateArrived();
+                                    synchronizationChecker.End();
                                 }
                             })
                             .Subscribe(slimSimpleNotifyCollectionChangedEventSubject.OnNext, subscribedOnError, subscribedOnCompleted);
@@ -174,21 +218,29 @@ namespace Kirinji.LinqToObservableCollection.Impl
                             .InitialStateAndChanged
                             .UseObserver((observer, e) =>
                             {
+                                synchronizationChecker.Start();
                                 try
                                 {
-                                    CurrentCollection.ApplyChangeEvent(e);
-                                }
-                                catch (InvalidInformationException<T> ex)
-                                {
-                                    observer.OnError(ex);
-                                }
+                                    try
+                                    {
+                                        CurrentCollection.ApplyChangeEvent(e);
+                                    }
+                                    catch (InvalidInformationException<T> ex)
+                                    {
+                                        observer.OnError(ex);
+                                    }
 
-                                observer.OnNext(e);
+                                    observer.OnNext(e);
 
-                                if (e.Action == NotifyCollectionChangedEventAction.InitialState)
+                                    if (e.Action == NotifyCollectionChangedEventAction.InitialState)
+                                    {
+                                        isInitialStateArrived = true;
+                                        onInitialStateArrived();
+                                    }
+                                }
+                                finally
                                 {
-                                    isInitialStateArrived = true;
-                                    onInitialStateArrived();
+                                    synchronizationChecker.End();
                                 }
                             })
                             .Subscribe(notifyCollectionChangedEventSubject.OnNext, subscribedOnError, subscribedOnCompleted);
@@ -206,16 +258,23 @@ namespace Kirinji.LinqToObservableCollection.Impl
             }
         }
 
-        void CreateCurrentTaggedCollection()
+        bool CreateCurrentTaggedCollectionOrCurrentCollection()
         {
             currentTaggedCollection = taggedCollectionCreator();
-            if (currentTaggedCollection == null || currentTaggedCollection.Count != 0)
+            if (currentTaggedCollection == null)
+            {
+                CreateCurrentCollection();
+                return false;
+            }
+            if (currentTaggedCollection.Count != 0)
             {
                 throw new InvalidOperationException();
             }
+            return true;
         }
 
         TCollection currentCollection;
+        /// <summary>Do not edit this collection from the outside. This property is available when taggedCollectionCreator == null or event is Default/Slim</summary>
         public TCollection CurrentCollection
         {
             get
@@ -227,6 +286,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
         }
 
         TTaggedCollection currentTaggedCollection;
+        /// <summary>Do not edit this collection from the outside. This property is available when taggedCollectionCreator != null and event is Simple/SlimSimple</summary>
         public TTaggedCollection CurrentTaggedCollection
         {
             get
@@ -367,6 +427,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
 
             return Observable.Create<INotifyCollectionChangedEvent<T>>(observer =>
             {
+                synchronizationChecker.Start();
                 if (isInitialStateArrived)
                 {
                     observer.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(CurrentCollection.ToArray().ToReadOnly()));
@@ -381,10 +442,13 @@ namespace Kirinji.LinqToObservableCollection.Impl
                 }
                 if (error != null || isCompleted)
                 {
+                    synchronizationChecker.End();
                     return System.Reactive.Disposables.Disposable.Empty;
                 }
 
-                return notifyCollectionChangedEventSubject.Subscribe(observer);
+                var result = notifyCollectionChangedEventSubject.Subscribe(observer);
+                synchronizationChecker.End();
+                return result;
             });
         }
 
@@ -395,6 +459,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
 
             return Observable.Create<SlimNotifyCollectionChangedEvent<T>>(observer =>
             {
+                synchronizationChecker.Start();
                 if (isInitialStateArrived)
                 {
                     var initialState = new SlimInitialState<T>(CurrentCollection.ToArray().ToReadOnly());
@@ -410,10 +475,13 @@ namespace Kirinji.LinqToObservableCollection.Impl
                 }
                 if (error != null || isCompleted)
                 {
+                    synchronizationChecker.End();
                     return System.Reactive.Disposables.Disposable.Empty;
                 }
 
-                return slimNotifyCollectionChangedEventSubject.Subscribe(observer);
+                var result = slimNotifyCollectionChangedEventSubject.Subscribe(observer);
+                synchronizationChecker.End();
+                return result;
             });
         }
 
@@ -424,6 +492,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
 
             return Observable.Create<SimpleNotifyCollectionChangedEvent<T>>(observer =>
             {
+                synchronizationChecker.Start();
                 if (isInitialStateArrived)
                 {
                     observer.OnNext(SimpleNotifyCollectionChangedEvent<T>.CreateInitialState(CurrentTaggedCollection.ToArray().ToReadOnly()));
@@ -438,10 +507,13 @@ namespace Kirinji.LinqToObservableCollection.Impl
                 }
                 if (error != null || isCompleted)
                 {
+                    synchronizationChecker.End();
                     return System.Reactive.Disposables.Disposable.Empty;
                 }
 
-                return simpleNotifyCollectionChangedEventSubject.Subscribe(observer);
+                var result = simpleNotifyCollectionChangedEventSubject.Subscribe(observer);
+                synchronizationChecker.End();
+                return result;
             });
         }
 
@@ -452,6 +524,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
 
             return Observable.Create<SlimSimpleNotifyCollectionChangedEvent<T>>(observer =>
             {
+                synchronizationChecker.Start();
                 if (isInitialStateArrived)
                 {
                     observer.OnNext(SlimSimpleNotifyCollectionChangedEvent<T>.CreateInitialState(CurrentTaggedCollection.ToArray().ToReadOnly()));
@@ -466,10 +539,13 @@ namespace Kirinji.LinqToObservableCollection.Impl
                 }
                 if (error != null || isCompleted)
                 {
+                    synchronizationChecker.End();
                     return System.Reactive.Disposables.Disposable.Empty;
                 }
 
-                return slimSimpleNotifyCollectionChangedEventSubject.Subscribe(observer);
+                var result = slimSimpleNotifyCollectionChangedEventSubject.Subscribe(observer);
+                synchronizationChecker.End();
+                return result;
             });
         }
 

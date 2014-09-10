@@ -18,50 +18,60 @@ namespace Kirinji.LinqToObservableCollection
 {
     public static partial class CollectionStatuses
     {
-        internal static ICollectionStatuses<T> Do<T>(this ICollectionStatuses<T> source, Action<INotifyCollectionChangedEvent<T>> action)
+        internal static ICollectionStatuses<T> ConvertToInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
+        {
+            Contract.Requires<ArgumentNullException>(source != null);
+            Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
+
+            return source
+                .InitialStateAndChanged
+                .ToStatuses();
+        }
+
+        internal static ICollectionStatuses<T> ConvertToSimpleInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
+        {
+            Contract.Requires<ArgumentNullException>(source != null);
+            Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
+
+            return source
+                .ToInstance()
+                .SimpleInitialStateAndChanged
+                .ToStatuses();
+        }
+
+        internal static ICollectionStatuses<T> ConvertToSlimInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
+        {
+            Contract.Requires<ArgumentNullException>(source != null);
+            Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
+
+            return source
+                .ToInstance()
+                .SlimInitialStateAndChanged
+                .ToStatuses();
+        }
+
+        internal static ICollectionStatuses<T> ConvertToSlimSimpleInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
+        {
+            Contract.Requires<ArgumentNullException>(source != null);
+            Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
+
+            return source
+                .ToInstance()
+                .SlimSimpleInitialStateAndChanged
+                .ToStatuses();
+        }
+
+        internal static ICollectionStatuses<T> Do<T>(this ICollectionStatuses<T> source, Action<NotifyCollectionChangedEventObject<T>> action)
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(action != null);
-            Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
-
-            return source.Do(action, _ => { throw new NotSupportedException(); });
-        }
-
-        internal static ICollectionStatuses<T> Do<T>(this ICollectionStatuses<T> source, Action<SimpleNotifyCollectionChangedEvent<T>> simpleAction)
-        {
-            Contract.Requires<ArgumentNullException>(source != null);
-            Contract.Requires<ArgumentNullException>(simpleAction != null);
-            Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
-
-            return source.Do(_ => { throw new NotSupportedException(); }, simpleAction);
-        }
-
-        // イベントの再構築が行われる可能性があるので注意
-        internal static ICollectionStatuses<T> Do<T>(this ICollectionStatuses<T> source, Action<INotifyCollectionChangedEvent<T>> action, Action<SimpleNotifyCollectionChangedEvent<T>> simpleAction)
-        {
-            Contract.Requires<ArgumentNullException>(source != null);
-            Contract.Requires<ArgumentNullException>(action != null);
-            Contract.Requires<ArgumentNullException>(simpleAction != null);
             Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
 
             var instance = source.ToInstance();
-
-            if(instance.RecommendedEvent.RecommendedEventType == RecommendedEventType.None
-                || instance.RecommendedEvent.RecommendedEventType == RecommendedEventType.DefaultOne
-                || instance.RecommendedEvent.RecommendedEventType == RecommendedEventType.SlimOne)
-            {
-                return instance
-                    .InitialStateAndChanged
-                    .Do(action)
-                    .ToStatuses();
-            }
-            else
-            {
-                return instance
-                    .SimpleInitialStateAndChanged
-                    .Do(simpleAction)
-                    .ToStatuses();
-            }
+            return instance
+                .EventsAsEventObject
+                .Do(action)
+                .ToStatuses(instance.RecommendedEvent);
         }
 
         internal static IObservable<ValueOrEmpty<T>> TakeOneItem<T>(this ICollectionStatuses<T> source, Func<IReadOnlyList<ValueOrEmpty<T>>, ValueOrEmpty<T>> converter)

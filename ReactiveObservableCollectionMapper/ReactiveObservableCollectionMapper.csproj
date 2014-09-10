@@ -135,6 +135,7 @@
     <Compile Include="Impl\OrderingComparers\OrderingComparer.cs" />
     <Compile Include="Impl\Producers\AnyProducer.cs" />
     <Compile Include="Impl\Producers\BasicCombineProducer.cs" />
+    <Compile Include="Impl\Producers\BasicCombineProducer2.cs" />
     <Compile Include="Impl\Producers\Box.cs" />
     <Compile Include="Impl\Producers\CastProducer.cs" />
     <Compile Include="Impl\Producers\CombineLatestProducer.cs" />
@@ -217,6 +218,7 @@
     <Compile Include="Support\Extractors\ISimpleNotifyCollectionChangedEventExtractor.cs" />
     <Compile Include="Support\Extractors\SimpleNotifyCollectionChangedEventExtractor.cs" />
     <Compile Include="Support\Inspect.cs" />
+    <Compile Include="Support\SynchronizationChecker.cs" />
     <Compile Include="Support\LightWands.cs" />
     <Compile Include="Support\Reference.cs" />
     <Compile Include="Tagged.cs" />

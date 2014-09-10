@@ -1,6 +1,7 @@
 ﻿using Kirinji.LinqToObservableCollection.SimpleNotifyCollectionChangedEvents;
 using Kirinji.LinqToObservableCollection.SlimNotifyCollectionChangedEvents;
 using Kirinji.LinqToObservableCollection.SlimSimpleNotifyCollectionChangedEvents;
+using Kirinji.LinqToObservableCollection.Support;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -103,6 +104,48 @@ namespace Kirinji.LinqToObservableCollection
             get
             {
                 return slimSimpleOne;
+            }
+        }
+
+        // InitialState に対応していないイベントの場合は null を返す（今のところ存在しない）
+        public bool? IsInitialState
+        {
+            get
+            {
+                switch (EventType)
+                {
+                    case NotifyCollectionChangedEventType.DefaultOne:
+                        return DefaultOne.Action == NotifyCollectionChangedEventAction.InitialState;
+                    case NotifyCollectionChangedEventType.SimpleOne:
+                        return SimpleOne.Action == SimpleNotifyCollectionChangedEventAction.InitialState;
+                    case NotifyCollectionChangedEventType.SlimOne:
+                        return SlimOne.Action == NotifyCollectionChangedEventAction.InitialState;
+                    case NotifyCollectionChangedEventType.SlimSimpleOne:
+                        return SlimSimpleOne.Action == SlimSimpleNotifyCollectionChangedEventAction.InitialState;
+                    default:
+                        throw Exceptions.UnpredictableSwitchCasePattern;
+                }
+            }
+        }
+
+        // Reset に対応していないイベントの場合は null を返す（今のところ存在しない）
+        public bool? IsReset
+        {
+            get
+            {
+                switch (EventType)
+                {
+                    case NotifyCollectionChangedEventType.DefaultOne:
+                        return DefaultOne.Action == NotifyCollectionChangedEventAction.Reset;
+                    case NotifyCollectionChangedEventType.SimpleOne:
+                        return SimpleOne.Action == SimpleNotifyCollectionChangedEventAction.Reset;
+                    case NotifyCollectionChangedEventType.SlimOne:
+                        return SlimOne.Action == NotifyCollectionChangedEventAction.Reset;
+                    case NotifyCollectionChangedEventType.SlimSimpleOne:
+                        return SlimSimpleOne.Action == SlimSimpleNotifyCollectionChangedEventAction.Reset;
+                    default:
+                        throw Exceptions.UnpredictableSwitchCasePattern;
+                }
             }
         }
     }
