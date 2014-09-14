@@ -8,7 +8,7 @@
     <ProjectGuid>{C4DBB381-095E-45DA-8AD9-12C95A85801B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ReactiveObservableCollectionMapper</RootNamespace>
+    <RootNamespace>Kirinji.LinqToObservableCollection</RootNamespace>
     <AssemblyName>ReactiveObservableCollectionMapper</AssemblyName>
     <DefaultLanguage>ja-JP</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
