@@ -1,6 +1,6 @@
 Reactive ObservableCollection Mapper
 ====================================
-This library provides quite easy way to convert a ObservableCollection/ReadOnlyObservableCollection into new ReadOnlyObservableCollection by using LINQ to Objects and Reactive Extensions style methods.
+This library provides quite easy way to **convert a ObservableCollection/ReadOnlyObservableCollection into new ReadOnlyObservableCollection by using LINQ to Objects and Reactive Extensions style methods**.
 
 This library is portable. Targets are:
 * .NET Framework 4.5
@@ -13,6 +13,18 @@ This project is still in beta and may change name or usage of methods.
 Download
 --------
 See [release page](https://github.com/syo00/Reactive-ObservableCollection-Mapper/releases)
+
+Requirements
+------------
+### To use binary(DLL file)
+You need Reactive extensions - Query library (Rx-Linq) and its dependent libraries.
+
+### To open and build project files
+You need these software and its extensions:
+
+* Visual Studio 2013 professional or higher
+* [Code contracts binary rewriter](http://visualstudiogallery.msdn.microsoft.com/1ec7db13-3363-46c9-851f-1ce455f66970)
+* [Nuget](http://nuget.org/)
 
 QuickStart
 ----------
@@ -53,10 +65,6 @@ ReadOnlyObservableCollection<string> observableCollection =
     .ObserveOn(synchronizationContext)
     .ToObservableCollection();
 ```
-
-Requirements
-------------
-You need Reactive extensions - Query library (Rx-Linq) and its dependent libraries.
 
 License
 -------
