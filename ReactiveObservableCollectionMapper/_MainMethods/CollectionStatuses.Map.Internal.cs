@@ -18,7 +18,7 @@ namespace Kirinji.LinqToObservableCollection
 {
     public static partial class CollectionStatuses
     {
-        internal static ICollectionStatuses<T> ConvertToInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
+        internal static CollectionStatuses<T> ConvertToInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
@@ -28,7 +28,7 @@ namespace Kirinji.LinqToObservableCollection
                 .ToStatuses();
         }
 
-        internal static ICollectionStatuses<T> ConvertToSimpleInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
+        internal static CollectionStatuses<T> ConvertToSimpleInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
@@ -39,7 +39,7 @@ namespace Kirinji.LinqToObservableCollection
                 .ToStatuses();
         }
 
-        internal static ICollectionStatuses<T> ConvertToSlimInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
+        internal static CollectionStatuses<T> ConvertToSlimInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
@@ -50,7 +50,7 @@ namespace Kirinji.LinqToObservableCollection
                 .ToStatuses();
         }
 
-        internal static ICollectionStatuses<T> ConvertToSlimSimpleInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
+        internal static CollectionStatuses<T> ConvertToSlimSimpleInitialStateAndChanged<T>(this ICollectionStatuses<T> source)
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
@@ -61,7 +61,7 @@ namespace Kirinji.LinqToObservableCollection
                 .ToStatuses();
         }
 
-        internal static ICollectionStatuses<T> Do<T>(this ICollectionStatuses<T> source, Action<NotifyCollectionChangedEventObject<T>> action)
+        internal static CollectionStatuses<T> Do<T>(this ICollectionStatuses<T> source, Action<NotifyCollectionChangedEventObject<T>> action)
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(action != null);

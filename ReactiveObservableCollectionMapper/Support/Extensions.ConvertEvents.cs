@@ -96,7 +96,7 @@ namespace Kirinji.LinqToObservableCollection.Support
 
             return Observable.Create<SimpleNotifyCollectionChangedEvent<T>>(observer =>
             {
-                var currentItems = new List<Tagged<T>>();
+                var currentItems = new TaggedCollection<T>();
 
                 return source
                     .Subscribe(e =>
@@ -128,7 +128,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                                             }
                                             else
                                             {
-                                                var removed = currentItems.RemoveAtRange(unit.Index, 1).Single();
+                                                var removed = currentItems.RemoveAtRange<Tagged<T>>(unit.Index, 1).Single();
                                                 newUnits.Add(new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Remove, removed, unit.Index));
                                             }
                                         }

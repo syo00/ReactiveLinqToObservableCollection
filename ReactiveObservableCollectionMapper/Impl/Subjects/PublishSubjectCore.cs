@@ -10,11 +10,11 @@ namespace Kirinji.LinqToObservableCollection.Impl.Subjects
     class PublishSubjectCore<T> : ISubject<INotifyCollectionChangedEvent<T>>
     {
         Subject<INotifyCollectionChangedEvent<T>> stream = new Subject<INotifyCollectionChangedEvent<T>>();
-        DelegationCollectionStatuses<T, List<T>, List<Tagged<T>>> core;
+        DelegationCollectionStatuses<T> core;
 
         public PublishSubjectCore()
         {
-            this.core = new DelegationCollectionStatuses<T, List<T>, List<Tagged<T>>>(stream.ToStatuses(), () => new List<T>(), () => new List<Tagged<T>>());
+            this.core = new DelegationCollectionStatuses<T>(stream.ToStatuses());
         }
 
         public void OnCompleted()

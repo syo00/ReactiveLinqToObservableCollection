@@ -5,17 +5,19 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
+using Kirinji.LightWands;
+using Kirinji.LinqToObservableCollection.Support;
 
 namespace Kirinji.LinqToObservableCollection.Impl.Subjects
 {
     class SimplePublishSubjectCore<T> : ISubject<SimpleNotifyCollectionChangedEvent<T>>
     {
         Subject<SimpleNotifyCollectionChangedEvent<T>> stream = new Subject<SimpleNotifyCollectionChangedEvent<T>>();
-        DelegationCollectionStatuses<T, List<T>, List<Tagged<T>>> core;
+        DelegationCollectionStatuses<T> core;
 
         public SimplePublishSubjectCore()
         {
-            this.core = new DelegationCollectionStatuses<T, List<T>, List<Tagged<T>>>(stream.ToStatuses(), () => new List<T>(), () => new List<Tagged<T>>());
+            this.core = new DelegationCollectionStatuses<T>(stream.ToStatuses());
         }
 
         public void OnCompleted()
@@ -38,11 +40,11 @@ namespace Kirinji.LinqToObservableCollection.Impl.Subjects
             return core.SimpleInitialStateAndChanged.Subscribe(observer);
         }
 
-        public IReadOnlyList<Tagged<T>> CurrentItems
+        public ReadOnlyTaggedCollection<T> CurrentItems
         {
             get
             {
-                return core.CurrentTaggedCollection;
+                return core.CurrentCollection;
             }
         }
     }

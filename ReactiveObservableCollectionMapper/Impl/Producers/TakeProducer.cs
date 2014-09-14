@@ -15,7 +15,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
     {
         readonly CollectionStatuses<T> source;
         readonly int takeCount;
-        readonly List<Tagged<T>> currentItems = new List<Tagged<T>>();
+        readonly TaggedCollection<T> currentItems = new TaggedCollection<T>();
 
         public TakeProducer(CollectionStatuses<T> source, int takeCount)
         {

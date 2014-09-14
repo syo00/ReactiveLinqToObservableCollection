@@ -12,11 +12,11 @@ namespace Kirinji.LinqToObservableCollection.Impl.Subjects
     class SlimPublishSubjectCore<T> : ISubject<SlimNotifyCollectionChangedEvent<T>>
     {
         Subject<SlimNotifyCollectionChangedEvent<T>> stream = new Subject<SlimNotifyCollectionChangedEvent<T>>();
-        DelegationCollectionStatuses<T, List<T>, List<Tagged<T>>> core;
+        DelegationCollectionStatuses<T> core;
 
         public SlimPublishSubjectCore()
         {
-            this.core = new DelegationCollectionStatuses<T, List<T>, List<Tagged<T>>>(stream.ToStatuses(), () => new List<T>(), () => new List<Tagged<T>>());
+            this.core = new DelegationCollectionStatuses<T>(stream.ToStatuses());
         }
 
         public void OnCompleted()

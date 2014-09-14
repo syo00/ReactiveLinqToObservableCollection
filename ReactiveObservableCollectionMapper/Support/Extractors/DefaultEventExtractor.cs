@@ -20,7 +20,7 @@ namespace Kirinji.LinqToObservableCollection.Support.Extractors
             {
                 case SimpleNotifyCollectionChangedEventAction.InitialState:
                     {
-                        return new[] { NotifyCollectionChangedEvent.CreateInitialStateEvent(source.InitialStateOrReset.Select(x => x.Item).ToArray().ToReadOnly()) }.ToReadOnly();
+                        return new[] { NotifyCollectionChangedEvent.CreateInitialStateEvent(source.InitialStateOrReset) }.ToReadOnly();
                     }
                 case SimpleNotifyCollectionChangedEventAction.AddOrRemove:
                     {
@@ -28,7 +28,7 @@ namespace Kirinji.LinqToObservableCollection.Support.Extractors
                     }
                 case SimpleNotifyCollectionChangedEventAction.Reset:
                     {
-                        return new[] { NotifyCollectionChangedEvent.CreateResetEvent<T>(source.InitialStateOrReset.Select(x => x.Item).ToArray().ToReadOnly()) };
+                        return new[] { NotifyCollectionChangedEvent.CreateResetEvent<T>(source.InitialStateOrReset) };
                     }
                 default:
                     throw Exceptions.UnpredictableSwitchCasePattern;
@@ -41,6 +41,22 @@ namespace Kirinji.LinqToObservableCollection.Support.Extractors
             Contract.Ensures(Contract.Result<IEnumerable<INotifyCollectionChangedEvent<T>>>() != null);
 
             return EventsConverter.ConvertToReplaced(EventsConverter.ConvertDuplicatedUnitItemsToSingle(ConvertItemsToMoved(source)))
+                //.Where(e =>
+                //    {
+                //        if(e.Action != NotifyCollectionChangedEventAction.Replace)
+                //        {
+                //            return true;
+                //        }
+
+                //        if(e.Replaced.OldItems.SequenceEqual(e.Replaced.NewItems))
+                //        {
+                //            return false;
+                //        }
+                //        else
+                //        {
+                //            return true;
+                //        }
+                //    })
                 .Select(e => Select(e, tagged => tagged.Item))
                 .ToArray()
                 .ToReadOnly();

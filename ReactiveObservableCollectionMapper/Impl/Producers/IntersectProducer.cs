@@ -12,12 +12,12 @@ using System.Reactive.Concurrency;
 namespace Kirinji.LinqToObservableCollection.Impl.Producers
 {
     // results are not ordered and not distincted like Enumerable.Intersect
-    class IntersectProducer<T, TSecond> : CombineProducer<T, TSecond, T>
+    class IntersectProducer<T, TSecond> : CombineProducer2<T, TSecond, T>
     {
-        readonly List<Tagged<T>> currentItems = new List<Tagged<T>>();
+        readonly TaggedCollection<Item> currentItems = new TaggedCollection<Item>();
 
         public IntersectProducer(CollectionStatuses<T> source, CollectionStatuses<TSecond> second, IReadOnlyCollection<SchedulingAndThreading> schedulingAndThreading, Func<T, TSecond, bool> comparer)
-            : base(source, second, schedulingAndThreading)
+            : base(source.ConvertToSimpleInitialStateAndChanged(), second.ConvertToSimpleInitialStateAndChanged(), schedulingAndThreading)
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(second != null);
@@ -38,120 +38,125 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             }
         }
 
-        protected override IReadOnlyList<Tagged<T>> ConvertInitialState(IReadOnlyList<Tagged<T>> initialLeftCollection, IReadOnlyList<Tagged<TSecond>> initialRightCollection)
+        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertInitialState(IReadOnlyList<T> initialLeftCollection, IReadOnlyList<TSecond> initialRightCollection)
         {
-            var result = initialLeftCollection
-                .Where(x => initialRightCollection.Any(y => Comparer(x.Item, y.Item)))
-                .ToArray()
-                .ToReadOnly();
-            currentItems.AddRange(result);
-            return result;
+            var items = OnInitialStateOrReset(initialLeftCollection, initialRightCollection);
+            var e = SimpleNotifyCollectionChangedEvent<T>.CreateInitialState(items);
+            yield return new NotifyCollectionChangedEventObject<T>(e);
         }
 
-        protected override IReadOnlyList<AddedOrRemovedUnit<T>> ConvertLeftUnits(IReadOnlyList<AddedOrRemovedUnit<T>> leftEvent)
+        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertLeftChanged(NotifyCollectionChangedEventObject<T> leftEvent)
         {
-            var result = new List<AddedOrRemovedUnit<T>>();
+            var units = new List<AddedOrRemovedUnit<T>>();
 
-            foreach (var e in leftEvent)
+            foreach (var e in leftEvent.SimpleOne.AddedOrRemoved)
             {
                 if (e.Type == AddOrRemoveUnitType.Add)
                 {
-                    var items = OnLeftItemAdded(e.Item);
+                    var items = OnLeftItemAdded(e.Index, e.Item);
                     if (items != null)
                     {
-                        result.Add(items);
+                        units.Add(items);
                     }
                 }
                 else
                 {
-                    var items = OnLeftItemRemoved(e.Item);
+                    var items = OnLeftItemRemoved(e.Index, e.Item);
                     if (items != null)
                     {
-                        result.Add(items);
+                        units.Add(items);
                     }
                 }
             }
 
-            return result.ToReadOnly();
+            var core = SimpleNotifyCollectionChangedEvent<T>.CreateAddOrRemove(units);
+            yield return new NotifyCollectionChangedEventObject<T>(core);
         }
 
-        protected override SimpleNotifyCollectionChangedEvent<T> ConvertLeftReset(IReadOnlyList<Tagged<T>> newLeftItems)
+        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertRightChanged(NotifyCollectionChangedEventObject<TSecond> rightEvent)
         {
-            var items = OnInitialStateOrReset(newLeftItems, RightCollection);
-            return SimpleNotifyCollectionChangedEvent<T>.CreateReset(items);
-        }
+            var units = new List<AddedOrRemovedUnit<T>>();
 
-        protected override IReadOnlyList<AddedOrRemovedUnit<T>> ConvertRightUnits(IReadOnlyList<AddedOrRemovedUnit<TSecond>> rightEvent)
-        {
-            var result = new List<AddedOrRemovedUnit<T>>();
-
-            foreach (var e in rightEvent)
+            foreach (var e in rightEvent.SimpleOne.AddedOrRemoved)
             {
                 if (e.Type == AddOrRemoveUnitType.Add)
                 {
                     var items = OnRightItemAdded(e.Item);
-                    result.AddRange(items);
-
+                    if (items != null)
+                    {
+                        units.AddRange(items);
+                    }
                 }
                 else
                 {
                     var items = OnRightItemRemoved(e.Item);
-                    result.AddRange(items);
+                    if (items != null)
+                    {
+                        units.AddRange(items);
+                    }
                 }
             }
 
-            return result.ToReadOnly();
+            var core = SimpleNotifyCollectionChangedEvent<T>.CreateAddOrRemove(units);
+            yield return new NotifyCollectionChangedEventObject<T>(core);
         }
 
-        protected override SimpleNotifyCollectionChangedEvent<T> ConvertRightReset(IReadOnlyList<Tagged<TSecond>> newRightItems)
+        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertLeftReset(IReadOnlyList<T> leftReset)
         {
-            var items = OnInitialStateOrReset(LeftCollection, newRightItems);
-            return SimpleNotifyCollectionChangedEvent<T>.CreateReset(items);
+            var items = OnInitialStateOrReset(leftReset, RightCollection);
+            var e = SimpleNotifyCollectionChangedEvent<T>.CreateReset(items);
+            yield return new NotifyCollectionChangedEventObject<T>(e);
         }
 
-        private IReadOnlyList<Tagged<T>> OnInitialStateOrReset(IReadOnlyList<Tagged<T>> leftCollection, IReadOnlyList<Tagged<TSecond>> rightCollection)
+        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertRightReset(IReadOnlyList<TSecond> rightReset)
+        {
+            var items = OnInitialStateOrReset(LeftCollection, rightReset);
+            var e = SimpleNotifyCollectionChangedEvent<T>.CreateReset(items);
+            yield return new NotifyCollectionChangedEventObject<T>(e);
+        }
+
+        private IReadOnlyList<T> OnInitialStateOrReset(IReadOnlyList<T> leftCollection, IReadOnlyList<TSecond> rightCollection)
         {
             Contract.Requires<ArgumentNullException>(leftCollection != null);
-            Contract.Requires<ArgumentException>(Contract.ForAll(leftCollection, item => item != null));
             Contract.Requires<ArgumentNullException>(rightCollection != null);
-            Contract.Requires<ArgumentException>(Contract.ForAll(rightCollection, item => item != null));
-            Contract.Ensures(Contract.Result<IReadOnlyList<Tagged<T>>>() != null);
-            Contract.Ensures(Contract.ForAll(Contract.Result<IReadOnlyList<Tagged<T>>>(), item => item != null));
+            Contract.Ensures(Contract.Result<IReadOnlyList<T>>() != null);
 
             currentItems.Clear();
-            var result = leftCollection
-                .Where(x => rightCollection.Any(y => Comparer(x.Item, y.Item)))
+            var items = leftCollection
+                .Select(x => new Item { HasValue = rightCollection.Any(y => Comparer(x, y)), Value = x })
                 .ToArray()
                 .ToReadOnly();
-            currentItems.AddRange(result);
-            return result;
+            currentItems.AddRange(items);
+            return items.Where(x => x.HasValue).Select(x => x.Value).ToArray().ToReadOnly();
         }
 
-        private AddedOrRemovedUnit<T> OnLeftItemAdded(Tagged<T> item)
+        private AddedOrRemovedUnit<T> OnLeftItemAdded(int index, Tagged<T> item)
         {
             Contract.Requires<ArgumentNullException>(item != null);
 
-            if (!RightCollection.Any(x => Comparer(item.Item, x.Item)))
+            var matched = RightCollection.Any<TSecond>(x => Comparer(item.Item, x));
+            currentItems.Insert(index, new Tagged<Item>(new Item { Value = item.Item, HasValue = matched }, item.Tag));
+
+            if (!matched)
             {
                 return null;
             }
 
-            var result = new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Add, item, currentItems.Count);
-            currentItems.Add(item);
-            return result;
+            return new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Add, item, currentItems.Take<Item>(index).Where(x => x.HasValue).Count());
         }
 
-        private AddedOrRemovedUnit<T> OnLeftItemRemoved(Tagged<T> item)
+        private AddedOrRemovedUnit<T> OnLeftItemRemoved(int index, Tagged<T> item)
         {
             Contract.Requires<ArgumentNullException>(item != null);
 
-            var matchedIndex = currentItems.FirstIndex(x => Object.Equals(x, item));
-            if (matchedIndex != null)
+            var removing = currentItems[index];
+            currentItems.RemoveAt(index);
+            if (!removing.Item.HasValue)
             {
-                currentItems.RemoveAt(matchedIndex.Value);
-                return new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Remove, item, matchedIndex.Value);
+                return null;
             }
-            return null;
+
+            return new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Remove, item, currentItems.Take<Item>(index).Where(x => x.HasValue).Count());
         }
 
         private IReadOnlyList<AddedOrRemovedUnit<T>> OnRightItemAdded(Tagged<TSecond> item)
@@ -159,14 +164,25 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             Contract.Requires<ArgumentNullException>(item != null);
             Contract.Ensures(Contract.Result<IReadOnlyList<AddedOrRemovedUnit<T>>>() != null);
 
-            var addingItems =
-                LeftCollection
-                .Except(currentItems)
-                .Where(x => Comparer(x.Item, item.Item))
-                .ToArray();
+            var result = new List<AddedOrRemovedUnit<T>>();
+            var existingItemsindex = 0;
+            foreach (var c in currentItems)
+            {
+                if (!c.Item.HasValue)
+                {
+                    if (Comparer(c.Item.Value, item.Item))
+                    {
+                        c.Item.HasValue = true;
+                        result.Add(new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Add, new Tagged<T>(c.Item.Value, c.Tag), existingItemsindex));
+                        existingItemsindex++;
+                    }
+                }
+                else
+                {
+                    existingItemsindex++;
+                }
+            }
 
-            var result = addingItems.Select((x, i) => new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Add, x, currentItems.Count + i)).ToArray().ToReadOnly();
-            currentItems.AddRange(addingItems);
             return result;
         }
 
@@ -175,26 +191,36 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             Contract.Requires<ArgumentNullException>(item != null);
             Contract.Ensures(Contract.Result<IReadOnlyList<AddedOrRemovedUnit<T>>>() != null);
 
-            return OnRightItemRemovedCore(item)
-                .ToArray()
-                .ToReadOnly();
+            var result = new List<AddedOrRemovedUnit<T>>();
+            var existingItemsindex = 0;
+            foreach (var c in currentItems)
+            {
+                if (c.Item.HasValue)
+                {
+                    if (Comparer(c.Item.Value, item.Item))
+                    {
+                        c.Item.HasValue = false;
+                        result.Add(new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Remove, new Tagged<T>(c.Item.Value, c.Tag), existingItemsindex));
+                    }
+                    else
+                    {
+                        existingItemsindex++;
+                    }
+                }
+            }
+
+            return result;
         }
 
-        private IEnumerable<AddedOrRemovedUnit<T>> OnRightItemRemovedCore(Tagged<TSecond> item)
+        class Item
         {
-            Contract.Requires<ArgumentNullException>(item != null);
-            Contract.Ensures(Contract.Result<IEnumerable<AddedOrRemovedUnit<T>>>() != null);
+            public T Value { get; set; }
+            public bool HasValue { get; set; }
 
-            var matchedItems = currentItems
-                .Where(x => Comparer(x.Item, item.Item))
-                .ToArray();
-            foreach (var m in matchedItems)
+            public override string ToString()
             {
-                var index = currentItems.IndexOf(m);
-                yield return new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Remove, m, index);
-                currentItems.RemoveAt(index);
+                return HasValue.ToString() + ": " + ObjectEx.ToString(Value);
             }
         }
-
     }
 }

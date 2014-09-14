@@ -15,7 +15,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
     {
         readonly CollectionStatuses<T> source;
         readonly int skipCount;
-        readonly List<Tagged<T>> currentItems = new List<Tagged<T>>();
+        readonly TaggedCollection<T> currentItems = new TaggedCollection<T>();
 
         public SkipProducer(CollectionStatuses<T> source, int skipCount)
         {

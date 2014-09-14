@@ -77,7 +77,7 @@ namespace Kirinji.LinqToObservableCollection.Support
             return Observable.Create<SimpleNotifyCollectionChangedEvent<T>>(observer =>
             {
                 var isInitialStateStreamed = false;
-                var currentItems = new List<Tagged<T>>();
+                var currentItems = new TaggedCollection<T>();
 
                 return source
                     .CheckSynchronization()
@@ -267,7 +267,7 @@ namespace Kirinji.LinqToObservableCollection.Support
             return Observable.Create<SimpleNotifyCollectionChangedEvent<T>>(observer =>
             {
                 var isInitialStateStreamed = false;
-                var currentItems = new List<Tagged<T>>();
+                var currentItems = new TaggedCollection<T>();
 
                 return source
                     .CheckSynchronization()

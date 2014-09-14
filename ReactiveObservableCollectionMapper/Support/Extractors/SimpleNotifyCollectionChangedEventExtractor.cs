@@ -23,7 +23,7 @@ namespace Kirinji.LinqToObservableCollection.Support.Extractors
             {
                 case SimpleNotifyCollectionChangedEventAction.InitialState:
                     {
-                        return new[] { NotifyCollectionChangedEvent.CreateInitialStateEvent(source.InitialStateOrReset.Select(x => x.Item).ToArray().ToReadOnly()) };
+                        return new[] { NotifyCollectionChangedEvent.CreateInitialStateEvent(source.InitialStateOrReset) };
                     }
                 case SimpleNotifyCollectionChangedEventAction.AddOrRemove:
                     {
@@ -31,7 +31,7 @@ namespace Kirinji.LinqToObservableCollection.Support.Extractors
                     }
                 case SimpleNotifyCollectionChangedEventAction.Reset:
                     {
-                        return new[] { NotifyCollectionChangedEvent.CreateResetEvent(source.InitialStateOrReset.Select(x => x.Item).ToArray().ToReadOnly()) };
+                        return new[] { NotifyCollectionChangedEvent.CreateResetEvent(source.InitialStateOrReset) };
                     }
                 default:
                     {

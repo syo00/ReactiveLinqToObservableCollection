@@ -14,10 +14,8 @@ using Kirinji.LinqToObservableCollection.Support;
 
 namespace Kirinji.LinqToObservableCollection.Impl
 {
-    // イベントに応じて IList の変更を任せるクラス
-    sealed class DelegationCollectionStatuses<T, TCollection, TTaggedCollection> : CollectionStatuses<T>, IDisposable
-        where TCollection : IList<T>
-        where TTaggedCollection : IList<Tagged<T>>
+    // イベントに応じてコレクションの変更を任せるクラス
+    sealed class DelegationCollectionStatuses<T> : CollectionStatuses<T>, IDisposable
     {
         IDisposable subscriptions;
         Exception error;
@@ -27,34 +25,20 @@ namespace Kirinji.LinqToObservableCollection.Impl
         Subject<SlimNotifyCollectionChangedEvent<T>> slimNotifyCollectionChangedEventSubject;
         Subject<SimpleNotifyCollectionChangedEvent<T>> simpleNotifyCollectionChangedEventSubject;
         Subject<SlimSimpleNotifyCollectionChangedEvent<T>> slimSimpleNotifyCollectionChangedEventSubject;
-        readonly Func<TCollection> collectionCreator;
-        readonly Func<TTaggedCollection> taggedCollectionCreator;
         readonly SynchronizationChecker synchronizationChecker = new SynchronizationChecker();
 
-        public DelegationCollectionStatuses(CollectionStatuses<T> source, Func<TCollection> collectionCreator)
-            : this(source, collectionCreator, null, () => { }, _ => { }, () => { })
+        public DelegationCollectionStatuses(CollectionStatuses<T> source)
+            : this(source, () => { }, _ => { }, () => { })
         {
             Contract.Requires<ArgumentNullException>(source != null);
-            Contract.Requires<ArgumentNullException>(collectionCreator != null);
         }
 
-        public DelegationCollectionStatuses(CollectionStatuses<T> source, Func<TCollection> collectionCreator, Func<TTaggedCollection> taggedCollectionCreator)
-            : this(source, collectionCreator, taggedCollectionCreator, () => { }, _ => { }, () => { })
+        public DelegationCollectionStatuses(CollectionStatuses<T> source, Action onInitialStateArrived, Action<Exception> onError, Action onCompleted)
         {
             Contract.Requires<ArgumentNullException>(source != null);
-            Contract.Requires<ArgumentNullException>(collectionCreator != null);
-        }
-
-        public DelegationCollectionStatuses(CollectionStatuses<T> source, Func<TCollection> collectionCreator, Func<TTaggedCollection> taggedCollectionCreator, Action onInitialStateArrived, Action<Exception> onError, Action onCompleted)
-        {
-            Contract.Requires<ArgumentNullException>(source != null);
-            Contract.Requires<ArgumentNullException>(collectionCreator != null);
             Contract.Requires<ArgumentNullException>(onInitialStateArrived != null);
             Contract.Requires<ArgumentNullException>(onError != null);
             Contract.Requires<ArgumentNullException>(onCompleted != null);
-
-            this.collectionCreator = collectionCreator;
-            this.taggedCollectionCreator = taggedCollectionCreator;
 
             Apply(source, onInitialStateArrived, onError, onCompleted);
         }
@@ -85,7 +69,6 @@ namespace Kirinji.LinqToObservableCollection.Impl
                         slimNotifyCollectionChangedEventSubject = new Subject<SlimNotifyCollectionChangedEvent<T>>();
                         subscribedOnError += slimNotifyCollectionChangedEventSubject.OnError;
                         subscribedOnCompleted += slimNotifyCollectionChangedEventSubject.OnCompleted;
-                        CreateCurrentCollection();
                         subscriptions = source
                             .SlimInitialStateAndChanged
                             .UseObserver((observer, e) =>
@@ -95,7 +78,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
                                     {
                                         try
                                         {
-                                            CurrentCollection.ApplySlimChangeEvent(e);
+                                            currentCollection.ApplySlimChangeEvent(e);
                                         }
                                         catch (InvalidInformationException<T> ex)
                                         {
@@ -123,7 +106,6 @@ namespace Kirinji.LinqToObservableCollection.Impl
                         simpleNotifyCollectionChangedEventSubject = new Subject<SimpleNotifyCollectionChangedEvent<T>>();
                         subscribedOnError += simpleNotifyCollectionChangedEventSubject.OnError;
                         subscribedOnCompleted += simpleNotifyCollectionChangedEventSubject.OnCompleted;
-                        CreateCurrentTaggedCollectionOrCurrentCollection();
                         subscriptions = source
                             .SimpleInitialStateAndChanged
                             .UseObserver((observer, e) =>
@@ -133,14 +115,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
                                 {
                                     try
                                     {
-                                        if (CurrentTaggedCollection == null)
-                                        {
-                                            CurrentCollection.ApplySimpleChangeEventWithoutTag(e);
-                                        }
-                                        else
-                                        {
-                                            CurrentTaggedCollection.ApplySimpleChangeEvent(e);
-                                        }
+                                        currentCollection.ApplySimpleChangeEventWithoutTag(e);
                                     }
                                     catch (InvalidInformationException<T> ex)
                                     {
@@ -168,7 +143,6 @@ namespace Kirinji.LinqToObservableCollection.Impl
                         slimSimpleNotifyCollectionChangedEventSubject = new Subject<SlimSimpleNotifyCollectionChangedEvent<T>>();
                         subscribedOnError += slimSimpleNotifyCollectionChangedEventSubject.OnError;
                         subscribedOnCompleted += slimSimpleNotifyCollectionChangedEventSubject.OnCompleted;
-                        CreateCurrentTaggedCollectionOrCurrentCollection();
                         subscriptions = source
                             .SlimSimpleInitialStateAndChanged
                             .UseObserver((observer, e) =>
@@ -178,14 +152,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
                                 {
                                     try
                                     {
-                                        if (CurrentTaggedCollection == null)
-                                        {
-                                            CurrentCollection.ApplySlimSimpleChangeEventWithoutTag(e);
-                                        }
-                                        else
-                                        {
-                                            CurrentTaggedCollection.ApplySlimSimpleChangeEvent(e);
-                                        }
+                                        currentCollection.ApplySlimSimpleChangeEventWithoutTag(e);
                                     }
                                     catch (InvalidInformationException<T> ex)
                                     {
@@ -213,7 +180,6 @@ namespace Kirinji.LinqToObservableCollection.Impl
                         notifyCollectionChangedEventSubject = new Subject<INotifyCollectionChangedEvent<T>>();
                         subscribedOnError += notifyCollectionChangedEventSubject.OnError;
                         subscribedOnCompleted += notifyCollectionChangedEventSubject.OnCompleted;
-                        CreateCurrentCollection();
                         subscriptions = source
                             .InitialStateAndChanged
                             .UseObserver((observer, e) =>
@@ -223,7 +189,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
                                 {
                                     try
                                     {
-                                        CurrentCollection.ApplyChangeEvent(e);
+                                        currentCollection.ApplyChangeEvent(e);
                                     }
                                     catch (InvalidInformationException<T> ex)
                                     {
@@ -249,51 +215,15 @@ namespace Kirinji.LinqToObservableCollection.Impl
             }
         }
 
-        void CreateCurrentCollection()
-        {
-            currentCollection = collectionCreator();
-            if (currentCollection == null || currentCollection.Count != 0)
-            {
-                throw new InvalidOperationException();
-            }
-        }
-
-        bool CreateCurrentTaggedCollectionOrCurrentCollection()
-        {
-            currentTaggedCollection = taggedCollectionCreator();
-            if (currentTaggedCollection == null)
-            {
-                CreateCurrentCollection();
-                return false;
-            }
-            if (currentTaggedCollection.Count != 0)
-            {
-                throw new InvalidOperationException();
-            }
-            return true;
-        }
-
-        TCollection currentCollection;
-        /// <summary>Do not edit this collection from the outside. This property is available when taggedCollectionCreator == null or event is Default/Slim</summary>
-        public TCollection CurrentCollection
+        TaggedCollection<T> currentCollection = new TaggedCollection<T>();
+        /// <summary>Do not edit this collection from the outside</summary>
+        public ReadOnlyTaggedCollection<T> CurrentCollection
         {
             get
             {
                 ThrowExceptionIfDisposed();
 
-                return currentCollection;
-            }
-        }
-
-        TTaggedCollection currentTaggedCollection;
-        /// <summary>Do not edit this collection from the outside. This property is available when taggedCollectionCreator != null and event is Simple/SlimSimple</summary>
-        public TTaggedCollection CurrentTaggedCollection
-        {
-            get
-            {
-                ThrowExceptionIfDisposed();
-
-                return currentTaggedCollection;
+                return currentCollection.ToReadOnly();
             }
         }
 
@@ -430,7 +360,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
                 synchronizationChecker.Start();
                 if (isInitialStateArrived)
                 {
-                    observer.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(CurrentCollection.ToArray().ToReadOnly()));
+                    observer.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(CurrentCollection.ToArray<T>().ToReadOnly()));
                 }
                 if (error != null)
                 {
@@ -462,7 +392,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
                 synchronizationChecker.Start();
                 if (isInitialStateArrived)
                 {
-                    var initialState = new SlimInitialState<T>(CurrentCollection.ToArray().ToReadOnly());
+                    var initialState = new SlimInitialState<T>(CurrentCollection.ToArray<T>().ToReadOnly());
                     observer.OnNext(new SlimNotifyCollectionChangedEvent<T>(initialState));
                 }
                 if (error != null)
@@ -495,7 +425,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
                 synchronizationChecker.Start();
                 if (isInitialStateArrived)
                 {
-                    observer.OnNext(SimpleNotifyCollectionChangedEvent<T>.CreateInitialState(CurrentTaggedCollection.ToArray().ToReadOnly()));
+                    observer.OnNext(SimpleNotifyCollectionChangedEvent<T>.CreateInitialState(CurrentCollection.ToArray<T>().ToReadOnly()));
                 }
                 if (error != null)
                 {
@@ -527,7 +457,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
                 synchronizationChecker.Start();
                 if (isInitialStateArrived)
                 {
-                    observer.OnNext(SlimSimpleNotifyCollectionChangedEvent<T>.CreateInitialState(CurrentTaggedCollection.ToArray().ToReadOnly()));
+                    observer.OnNext(SlimSimpleNotifyCollectionChangedEvent<T>.CreateInitialState(CurrentCollection.ToArray<T>().ToReadOnly()));
                 }
                 if (error != null)
                 {

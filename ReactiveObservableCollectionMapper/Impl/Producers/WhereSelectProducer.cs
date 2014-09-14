@@ -14,7 +14,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
     class WhereSelectProducer<T, TTo> : Producer<SimpleNotifyCollectionChangedEvent<TTo>>
     {
         // source.InitialStateAndChanged のうち、Convert によって除外されたものを HasValue == false に置き換えたものを示す
-        readonly List<ValueOrEmpty<Tagged<TTo>>> sourceInitialStateAndChanged = new List<ValueOrEmpty<Tagged<TTo>>>();
+        readonly List<ValueOrEmpty<TTo>> sourceInitialStateAndChanged = new List<ValueOrEmpty<TTo>>();
         readonly CollectionStatuses<T> source;
         readonly Func<T, bool> predicate;
         readonly Func<T, TTo> converter;
@@ -45,7 +45,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
                             return;
                         case SimpleNotifyCollectionChangedEventAction.AddOrRemove:
                             var newAddedAndRemoved = e.AddedOrRemoved
-                                .Select(x => x.Type == AddOrRemoveUnitType.Add ? Insert(x.Index, x.Item) : Remove(x.Index))
+                                .Select(x => x.Type == AddOrRemoveUnitType.Add ? Insert(x.Index, x.Item) : Remove(x.Index, x.Item.Tag))
                                 .Where(x => x != null)
                                 .ToArray()
                                 .ToReadOnly();
@@ -59,18 +59,16 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
                 }, observer.OnError, observer.OnCompleted);
         }
 
-        IReadOnlyList<Tagged<TTo>> InitialStateOrReset(IEnumerable<Tagged<T>> items)
+        IReadOnlyList<TTo> InitialStateOrReset(IEnumerable<T> items)
         {
             Contract.Requires<ArgumentNullException>(items != null);
-            Contract.Requires<ArgumentException>(Contract.ForAll(items, item => item != null));
-            Contract.Ensures(Contract.Result<IReadOnlyList<Tagged<TTo>>>() != null);
-            Contract.Ensures(Contract.ForAll(Contract.Result<IReadOnlyList<Tagged<TTo>>>(), item => item != null));
+            Contract.Ensures(Contract.Result<IReadOnlyList<TTo>>() != null);
 
             sourceInitialStateAndChanged.Clear();
             var newInitialStateItems = items
-                .Select((x, i) => Insert(i, x))
+                .Select((x, i) => Insert(i, new Tagged<T>(x)))
                 .Where(x => x != null)
-                .Select(x => x.Item)
+                .Select(x => x.Item.Item)
                 .ToArray()
                 .ToReadOnly();
             return newInitialStateItems;
@@ -84,17 +82,17 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             {
                 var newIndex = sourceInitialStateAndChanged.Take(index).Where(x => x.HasValue).Count();
                 var convertedItem = new Tagged<TTo>(converter(item.Item), item.Tag);
-                sourceInitialStateAndChanged.Insert(index, new ValueOrEmpty<Tagged<TTo>>(convertedItem));
+                sourceInitialStateAndChanged.Insert(index, new ValueOrEmpty<TTo>(convertedItem.Item));
                 return new AddedOrRemovedUnit<TTo>(AddOrRemoveUnitType.Add, convertedItem, newIndex);
             }
             else
             {
-                sourceInitialStateAndChanged.Insert(index, new ValueOrEmpty<Tagged<TTo>>());
+                sourceInitialStateAndChanged.Insert(index, new ValueOrEmpty<TTo>());
                 return null;
             }
         }
 
-        AddedOrRemovedUnit<TTo> Remove(int index)
+        AddedOrRemovedUnit<TTo> Remove(int index, object tag)
         {
             Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
 
@@ -107,7 +105,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
 
             var newIndex = sourceInitialStateAndChanged.Take(index).Where(x => x.HasValue).Count();
             sourceInitialStateAndChanged.RemoveAt(index);
-            return new AddedOrRemovedUnit<TTo>(AddOrRemoveUnitType.Remove, removingItem.Value, newIndex);
+            return new AddedOrRemovedUnit<TTo>(AddOrRemoveUnitType.Remove, new Tagged<TTo>(removingItem.Value, tag), newIndex);
         }
     }
 }

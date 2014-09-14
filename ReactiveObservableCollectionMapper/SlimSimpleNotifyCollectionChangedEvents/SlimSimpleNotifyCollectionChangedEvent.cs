@@ -17,10 +17,9 @@ namespace Kirinji.LinqToObservableCollection.SlimSimpleNotifyCollectionChangedEv
 
         }
 
-        public static SlimSimpleNotifyCollectionChangedEvent<T> CreateInitialState(IReadOnlyList<Tagged<T>> items)
+        public static SlimSimpleNotifyCollectionChangedEvent<T> CreateInitialState(IReadOnlyList<T> items)
         {
             Contract.Requires<ArgumentNullException>(items != null);
-            Contract.Requires<ArgumentException>(Contract.ForAll(items, item => item != null));
             Contract.Ensures(Contract.Result<SlimSimpleNotifyCollectionChangedEvent<T>>() != null);
 
             var result = new SlimSimpleNotifyCollectionChangedEvent<T>();
@@ -41,15 +40,14 @@ namespace Kirinji.LinqToObservableCollection.SlimSimpleNotifyCollectionChangedEv
             return result;
         }
 
-        public static SlimSimpleNotifyCollectionChangedEvent<T> CreateReset(IReadOnlyList<Tagged<T>> newItems)
+        public static SlimSimpleNotifyCollectionChangedEvent<T> CreateReset(IReadOnlyList<T> items)
         {
-            Contract.Requires<ArgumentNullException>(newItems != null);
-            Contract.Requires<ArgumentException>(Contract.ForAll(newItems, item => item != null));
+            Contract.Requires<ArgumentNullException>(items != null);
             Contract.Ensures(Contract.Result<SlimSimpleNotifyCollectionChangedEvent<T>>() != null);
 
             var result = new SlimSimpleNotifyCollectionChangedEvent<T>();
             result.action = SlimSimpleNotifyCollectionChangedEventAction.Reset;
-            result.initialStateOrReset = newItems;
+            result.initialStateOrReset = items;
             return result;
         }
 
@@ -62,8 +60,8 @@ namespace Kirinji.LinqToObservableCollection.SlimSimpleNotifyCollectionChangedEv
             }
         }
 
-        IReadOnlyList<Tagged<T>> initialStateOrReset;
-        public IReadOnlyList<Tagged<T>> InitialStateOrReset
+        IReadOnlyList<T> initialStateOrReset;
+        public IReadOnlyList<T> InitialStateOrReset
         {
             get
             {

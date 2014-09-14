@@ -16,7 +16,7 @@ using System.Collections.ObjectModel;
 namespace Kirinji.LinqToObservableCollection.Impl
 {
     // イベントに応じて  MultiValuesObservableCollection の変更を任せるクラス
-    sealed class DelegationCollectionStatuses<T> : CollectionStatuses<T>, IDisposable
+    sealed class DelegationObservableCollectionCollectionStatuses<T> : CollectionStatuses<T>, IDisposable
     {
         IDisposable subscriptions;
         Exception error;
@@ -25,7 +25,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
         Subject<INotifyCollectionChangedEvent<T>> notifyCollectionChangedEventSubject;
         Subject<SlimNotifyCollectionChangedEvent<T>> slimNotifyCollectionChangedEventSubject;
 
-        public DelegationCollectionStatuses(CollectionStatuses<T> source, Func<MultiValuesObservableCollection<T>> collectionCreator, Action onInitialStateArrived, Action<Exception> onError, Action onCompleted)
+        public DelegationObservableCollectionCollectionStatuses(CollectionStatuses<T> source, Func<MultiValuesObservableCollection<T>> collectionCreator, Action onInitialStateArrived, Action<Exception> onError, Action onCompleted)
         {
             Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(collectionCreator != null);
@@ -336,7 +336,7 @@ namespace Kirinji.LinqToObservableCollection.Impl
         }
         #endregion
 
-        ~DelegationCollectionStatuses()
+        ~DelegationObservableCollectionCollectionStatuses()
         {
             Dispose(false);
         }

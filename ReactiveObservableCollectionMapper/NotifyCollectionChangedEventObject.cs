@@ -128,6 +128,31 @@ namespace Kirinji.LinqToObservableCollection
             }
         }
 
+        public IReadOnlyList<T> InitialStateItems
+        {
+            get
+            {
+                if(IsInitialState != true)
+                {
+                    return null;
+                }
+
+                switch (EventType)
+                {
+                    case NotifyCollectionChangedEventType.DefaultOne:
+                        return DefaultOne.InitialState.Items;
+                    case NotifyCollectionChangedEventType.SimpleOne:
+                        return SimpleOne.InitialStateOrReset;
+                    case NotifyCollectionChangedEventType.SlimOne:
+                        return SlimOne.InitialState.Items;
+                    case NotifyCollectionChangedEventType.SlimSimpleOne:
+                        return SlimSimpleOne.InitialStateOrReset;
+                    default:
+                        throw Exceptions.UnpredictableSwitchCasePattern;
+                }
+            }
+        }
+
         // Reset に対応していないイベントの場合は null を返す（今のところ存在しない）
         public bool? IsReset
         {
@@ -143,6 +168,31 @@ namespace Kirinji.LinqToObservableCollection
                         return SlimOne.Action == NotifyCollectionChangedEventAction.Reset;
                     case NotifyCollectionChangedEventType.SlimSimpleOne:
                         return SlimSimpleOne.Action == SlimSimpleNotifyCollectionChangedEventAction.Reset;
+                    default:
+                        throw Exceptions.UnpredictableSwitchCasePattern;
+                }
+            }
+        }
+
+        public IReadOnlyList<T> ResetItems
+        {
+            get
+            {
+                if (IsReset != true)
+                {
+                    return null;
+                }
+
+                switch (EventType)
+                {
+                    case NotifyCollectionChangedEventType.DefaultOne:
+                        return DefaultOne.Reset.Items;
+                    case NotifyCollectionChangedEventType.SimpleOne:
+                        return SimpleOne.InitialStateOrReset;
+                    case NotifyCollectionChangedEventType.SlimOne:
+                        return SlimOne.Reset.Items;
+                    case NotifyCollectionChangedEventType.SlimSimpleOne:
+                        return SlimSimpleOne.InitialStateOrReset;
                     default:
                         throw Exceptions.UnpredictableSwitchCasePattern;
                 }

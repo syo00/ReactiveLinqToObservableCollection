@@ -123,7 +123,7 @@ namespace Kirinji.LinqToObservableCollection
             Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
 
             return ProducerObservable.Create(() => new ExceptProducer<T, TSecond>(source.ToInstance(), second.ToInstance(), schedulingAndThreading, comparer))
-                .ToStatuses();
+                .ToStatuses(new RecommendedEvent(false, false, true, false));
         }
 
         public static ICollectionStatuses<T> Flatten<T>(this ICollectionStatuses<ICollectionStatuses<T>> source)
@@ -183,7 +183,7 @@ namespace Kirinji.LinqToObservableCollection
             Contract.Ensures(Contract.Result<ICollectionStatuses<T>>() != null);
 
             return ProducerObservable.Create(() => new IntersectProducer<T, TSecond>(source.ToInstance(), second.ToInstance(), schedulingAndThreading, comparer))
-                .ToStatuses();
+                .ToStatuses(new RecommendedEvent(false, false, true, false));
         }
 
         public static ICollectionStatuses<TResult> Join<TOuter, TInner, TKey, TResult>(
@@ -411,14 +411,14 @@ namespace Kirinji.LinqToObservableCollection
                             }
 
                             var newItems = e.InitialStateOrReset
-                                .Select((tagged, i) => new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Add, tagged, i))
+                                .Select((item, i) => new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Add, new Tagged<T>(item), i))
                                 .ToArray()
                                 .ToReadOnly();
                             return SimpleNotifyCollectionChangedEvent<T>.CreateAddOrRemove(newItems);
                         }
                         return e;
                     })
-                    .StartWith(SimpleNotifyCollectionChangedEvent<T>.CreateInitialState(new Tagged<T>[0].ToReadOnly()))
+                    .StartWith(SimpleNotifyCollectionChangedEvent<T>.CreateInitialState(new T[0].ToReadOnly()))
                     .ToStatuses();
             }
 
@@ -435,14 +435,14 @@ namespace Kirinji.LinqToObservableCollection
                             }
 
                             var newItems = e.InitialStateOrReset
-                                .Select((tagged, i) => new SlimAddedOrRemovedUnit<T>(tagged, i))
+                                .Select((item, i) => new SlimAddedOrRemovedUnit<T>(new Tagged<T>(item), i))
                                 .ToArray()
                                 .ToReadOnly();
                             return SlimSimpleNotifyCollectionChangedEvent<T>.CreateAddedOrRemoved(newItems);
                         }
                         return e;
                     })
-                    .StartWith(SlimSimpleNotifyCollectionChangedEvent<T>.CreateInitialState(new Tagged<T>[0].ToReadOnly()))
+                    .StartWith(SlimSimpleNotifyCollectionChangedEvent<T>.CreateInitialState(new T[0].ToReadOnly()))
                     .ToStatuses();
             }
 

@@ -33,7 +33,7 @@ namespace Kirinji.LinqToObservableCollection
 
             this.items = new Lazy<MultiValuesObservableCollection<T>>(() => (MultiValuesObservableCollection<T>)base.Items);
 
-            var x = new DelegationCollectionStatuses<T>(
+            var x = new DelegationObservableCollectionCollectionStatuses<T>(
                 statuses,
                 () => this.items.Value,
                 () => IsInitialStateArrived = true,

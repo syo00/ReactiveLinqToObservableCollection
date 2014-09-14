@@ -17,10 +17,9 @@ namespace Kirinji.LinqToObservableCollection.SimpleNotifyCollectionChangedEvents
 
         }
 
-        public static SimpleNotifyCollectionChangedEvent<T> CreateInitialState(IReadOnlyList<Tagged<T>> initialState)
+        public static SimpleNotifyCollectionChangedEvent<T> CreateInitialState(IReadOnlyList<T> initialState)
         {
             Contract.Requires<ArgumentNullException>(initialState != null);
-            Contract.Requires<ArgumentException>(Contract.ForAll(initialState, item => item != null));
             Contract.Ensures(Contract.Result<SimpleNotifyCollectionChangedEvent<T>>() != null);
 
             var result = new SimpleNotifyCollectionChangedEvent<T>();
@@ -52,10 +51,9 @@ namespace Kirinji.LinqToObservableCollection.SimpleNotifyCollectionChangedEvents
             return result;
         }
 
-        public static SimpleNotifyCollectionChangedEvent<T> CreateReset(IReadOnlyList<Tagged<T>> reset)
+        public static SimpleNotifyCollectionChangedEvent<T> CreateReset(IReadOnlyList<T> reset)
         {
             Contract.Requires<ArgumentNullException>(reset != null);
-            Contract.Requires<ArgumentException>(Contract.ForAll(reset, item => item != null));
             Contract.Ensures(Contract.Result<SimpleNotifyCollectionChangedEvent<T>>() != null);
 
             var result = new SimpleNotifyCollectionChangedEvent<T>();
@@ -73,8 +71,8 @@ namespace Kirinji.LinqToObservableCollection.SimpleNotifyCollectionChangedEvents
             }
         }
 
-        IReadOnlyList<Tagged<T>> initialStateOrReset;
-        public IReadOnlyList<Tagged<T>> InitialStateOrReset
+        IReadOnlyList<T> initialStateOrReset;
+        public IReadOnlyList<T> InitialStateOrReset
         {
             get
             {
@@ -134,7 +132,7 @@ namespace Kirinji.LinqToObservableCollection.SimpleNotifyCollectionChangedEvents
             Contract.Requires<ArgumentNullException>(initialState != null);
             Contract.Ensures(Contract.Result<SimpleNotifyCollectionChangedEvent<T>>() != null);
 
-            return SimpleNotifyCollectionChangedEvent<T>.CreateInitialState(initialState.Items.Select(x => new Tagged<T>(x)).ToArray().ToReadOnly());
+            return SimpleNotifyCollectionChangedEvent<T>.CreateInitialState(initialState.Items);
         }
 
         public static SimpleNotifyCollectionChangedEvent<T> Create(IAdded<T> added)
@@ -221,7 +219,7 @@ namespace Kirinji.LinqToObservableCollection.SimpleNotifyCollectionChangedEvents
             Contract.Requires<ArgumentNullException>(reset != null);
             Contract.Ensures(Contract.Result<SimpleNotifyCollectionChangedEvent<T>>() != null);
 
-            return SimpleNotifyCollectionChangedEvent<T>.CreateReset(reset.Items.Select(x => new Tagged<T>(x)).ToArray().ToReadOnly());
+            return SimpleNotifyCollectionChangedEvent<T>.CreateReset(reset.Items);
         }
 
         public override string ToString()

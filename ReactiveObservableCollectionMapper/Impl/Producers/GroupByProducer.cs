@@ -70,7 +70,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
                             case NotifyCollectionChangedEventAction.InitialState:
                                 {
                                     var newItems = CreatedAddedUnits(e.InitialState.Items)
-                                        .Select(unit => unit.Item)
+                                        .Select(unit => unit.Item.Item)
                                         .ToArray()
                                         .ToReadOnly();
                                     var newEvent = SimpleNotifyCollectionChangedEvent<IGroupedCollectionStatuses<TKey, TElement>>.CreateInitialState(newItems);
@@ -114,7 +114,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
                                     ClearKeys();
 
                                     var newItems = CreatedAddedUnits(e.Reset.Items)
-                                        .Select(unit => unit.Item)
+                                        .Select(unit => unit.Item.Item)
                                         .ToArray()
                                         .ToReadOnly();
                                     var newEvent = SimpleNotifyCollectionChangedEvent<IGroupedCollectionStatuses<TKey, TElement>>.CreateReset(newItems);

@@ -19,8 +19,9 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
     {
         readonly CollectionStatuses<TSource1> leftSource;
         readonly CollectionStatuses<TSource2> rightSource;
-        readonly SimplePublishSubject<TSource1> leftSourceSubject = new SimplePublishSubject<TSource1>();
-        readonly SimplePublishSubject<TSource2> rightSourceSubject = new SimplePublishSubject<TSource2>();
+        
+        CollectionStatuses<TSource1> leftStatuses;
+        CollectionStatuses<TSource2> rightStatuses;
         readonly List<Tagged<T>> convertedCurrentItems = new List<Tagged<T>>();
         IReadOnlyCollection<SchedulingAndThreading> schedulingAndThreading;
         bool isLeftInitialStateArrived;
@@ -38,15 +39,16 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             this.schedulingAndThreading = schedulingAndThreading;
         }
 
-        protected abstract IEnumerable<T> ConvertLeftEvent(SimpleNotifyCollectionChangedEvent<TSource1> e);
+        protected abstract IEnumerable<T> ConvertLeftEvent(NotifyCollectionChangedEventObject<TSource1> e);
 
-        protected abstract IEnumerable<T> ConvertRightEvent(SimpleNotifyCollectionChangedEvent<TSource2> e);
+        protected abstract IEnumerable<T> ConvertRightEvent(NotifyCollectionChangedEventObject<TSource2> e);
 
-        protected IReadOnlyList<Tagged<TSource1>> LeftCollection
+        ReadOnlyTaggedCollection<TSource1> leftCollection;
+        protected ReadOnlyTaggedCollection<TSource1> LeftCollection
         {
             get
             {
-                return leftSourceSubject.CurrentItems;
+                return leftCollection;
             }
         }
 
@@ -54,15 +56,16 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
         {
             get
             {
-                return leftSourceSubject.ToStatuses();
+                return leftStatuses;
             }
         }
 
-        protected IReadOnlyList<Tagged<TSource2>> RightCollection
+        ReadOnlyTaggedCollection<TSource2> rightCollection;
+        protected ReadOnlyTaggedCollection<TSource2> RightCollection
         {
             get
             {
-                return rightSourceSubject.CurrentItems;
+                return rightCollection;
             }
         }
 
@@ -70,7 +73,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
         {
             get
             {
-                return rightSourceSubject.ToStatuses();
+                return rightStatuses;
             }
         }
 
@@ -94,13 +97,20 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
 
         protected sealed override IDisposable SubscribeCore(ProducerObserver<T> observer)
         {
+            var leftStatuses = new DelegationCollectionStatuses<TSource1>(leftSource);
+            var rightStatuses = new DelegationCollectionStatuses<TSource2>(rightSource);
+            this.leftStatuses = leftStatuses;
+            this.rightStatuses = rightStatuses;
+            leftCollection = leftStatuses.CurrentCollection;
+            rightCollection = rightStatuses.CurrentCollection;
+
             var mergedStream =
-                leftSource
-                .SimpleInitialStateAndChanged
-                .Select(x => new Choice<SimpleNotifyCollectionChangedEvent<TSource1>, SimpleNotifyCollectionChangedEvent<TSource2>>(x))
-                .Merge(rightSource
-                    .SimpleInitialStateAndChanged
-                    .Select(x => new Choice<SimpleNotifyCollectionChangedEvent<TSource1>, SimpleNotifyCollectionChangedEvent<TSource2>>(x)));
+                leftStatuses
+                .EventsAsEventObject
+                .Select(x => new Choice<NotifyCollectionChangedEventObject<TSource1>, NotifyCollectionChangedEventObject<TSource2>>(x))
+                .Merge(rightStatuses
+                    .EventsAsEventObject
+                    .Select(x => new Choice<NotifyCollectionChangedEventObject<TSource1>, NotifyCollectionChangedEventObject<TSource2>>(x)));
 
             var subscribingStream = mergedStream;
             foreach (var item in schedulingAndThreading)
@@ -121,28 +131,34 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
                 .Subscribe(x =>
                 {
                     x.Action(leftEvent =>
+                    {
+                        var newNextEvents = ConvertLeftEvent(leftEvent).ToArray();
+
+                        if (leftEvent.IsInitialState == true)
                         {
-                            var newNextEvents = ConvertLeftEvent(leftEvent).ToArray();
-
-                            if (leftEvent.Action == SimpleNotifyCollectionChangedEventAction.InitialState)
-                            {
-                                isLeftInitialStateArrived = true;
-                            }
-
-                            leftSourceSubject.OnNext(leftEvent);
-                            newNextEvents.ForEach(observer.OnNext);
-                        }, rightEvent =>
+                            isLeftInitialStateArrived = true;
+                        }
+                        if (leftEvent.IsInitialState == null)
                         {
-                            var newNextEvents = ConvertRightEvent(rightEvent).ToArray();
+                            throw new InvalidOperationException();
+                        }
+                        
+                        newNextEvents.ForEach(observer.OnNext);
+                    }, rightEvent =>
+                    {
+                        var newNextEvents = ConvertRightEvent(rightEvent).ToArray();
 
-                            if (rightEvent.Action == SimpleNotifyCollectionChangedEventAction.InitialState)
-                            {
-                                isRightInitialStateArrived = true;
-                            }
+                        if (rightEvent.IsInitialState == true)
+                        {
+                            isRightInitialStateArrived = true;
+                        }
+                        if (rightEvent.IsInitialState == null)
+                        {
+                            throw new InvalidOperationException();
+                        }
 
-                            rightSourceSubject.OnNext(rightEvent);
-                            newNextEvents.ForEach(observer.OnNext);
-                        });
+                        newNextEvents.ForEach(observer.OnNext);
+                    });
                 }, observer.OnError, observer.OnCompleted);
         }
     }
@@ -156,7 +172,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<T> ConvertLeftEvent(SimpleNotifyCollectionChangedEvent<TSource1> e)
+        protected override IEnumerable<T> ConvertLeftEvent(NotifyCollectionChangedEventObject<TSource1> e)
         {
             Contract.Requires<ArgumentNullException>(e != null);
             Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
@@ -164,7 +180,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<T> ConvertRightEvent(SimpleNotifyCollectionChangedEvent<TSource2> e)
+        protected override IEnumerable<T> ConvertRightEvent(NotifyCollectionChangedEventObject<TSource2> e)
         {
             Contract.Requires<ArgumentNullException>(e != null);
             Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);

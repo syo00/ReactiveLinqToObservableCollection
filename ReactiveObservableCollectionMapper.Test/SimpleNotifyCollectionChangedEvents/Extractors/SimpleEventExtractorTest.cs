@@ -25,7 +25,7 @@ namespace Kirinji.LinqToObservableCollection.Test.SimpleNotifyCollectionChangedE
             events.Select(x => extractor.Extract(x)).SelectMany(x => x).Subscribe(result.ApplyChangeEvent);
             result.Count.Is(0);
 
-            var initialState = new[] { tag[1], tag[2], tag[3] };
+            var initialState = new[] { 1, 2, 3 };
             events.OnNext(SimpleNotifyCollectionChangedEvent<int>.CreateInitialState(initialState));
             result.Is(1, 2, 3);
 
@@ -101,6 +101,14 @@ namespace Kirinji.LinqToObservableCollection.Test.SimpleNotifyCollectionChangedE
             var event9 = SimpleNotifyCollectionChangedEvent<int>.CreateAddOrRemove(new[] { event9_1, event9_2, event9_3, event9_4, event9_5, event9_6, event9_7, event9_8, event9_9 });
             events.OnNext(event9);
             result.Is(3, 7, 8, 4);
+
+            var event10_1 = new AddedOrRemovedUnit<int>(AddOrRemoveUnitType.Remove, tag[7], 1); // => [3, 8, 4]
+            var event10_2 = new AddedOrRemovedUnit<int>(AddOrRemoveUnitType.Add, tag[6], 1); // => [3, 6, 8, 4]
+            var event10_3 = new AddedOrRemovedUnit<int>(AddOrRemoveUnitType.Remove, tag[6], 1); // => [3, 8, 4]
+            var event10_4 = new AddedOrRemovedUnit<int>(AddOrRemoveUnitType.Add, tag[5], 1); // => [3, 5, 8, 4]
+            var event10 = SimpleNotifyCollectionChangedEvent<int>.CreateAddOrRemove(new[] { event10_1, event10_2, event10_3, event10_4 });
+            events.OnNext(event10);
+            result.Is(3, 5, 8, 4);
         }
     }
 }

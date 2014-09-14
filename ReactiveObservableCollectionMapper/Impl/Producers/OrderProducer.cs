@@ -104,25 +104,21 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             }
         }
 
-        private IReadOnlyList<Tagged<T>> InitialStateOrReset(IReadOnlyList<Tagged<T>> items)
+        private IReadOnlyList<T> InitialStateOrReset(IReadOnlyList<T> items)
         {
             Contract.Requires<ArgumentNullException>(items != null);
-            Contract.Requires<ArgumentException>(Contract.ForAll(items, x => x != null));
-            Contract.Ensures(Contract.Result<IReadOnlyList<Tagged<T>>>() != null);
-            Contract.Ensures(Contract.ForAll(Contract.Result<IReadOnlyList<Tagged<T>>>(), x => x != null));
+            Contract.Ensures(Contract.Result<IReadOnlyList<T>>() != null);
 
             ordered.Clear();
             notOrdered.Clear();
             var converted =
-               order.Order(items.Select((x, i) => new KeyValuePair<int, Tagged<T>>(i, x)), pair => pair.Value.Item)
+               order.Order(items.Select((x, i) => new KeyValuePair<int, T>(i, x)), pair => pair.Value)
                 .ToArray()
                 .ToReadOnly();
             notOrdered =
                 items
-                .Select(tagged => tagged.Item)
                 .ToList();
             ordered = converted
-                .Select(pair => new KeyValuePair<int, T>(pair.Key, pair.Value.Item))
                 .ToList();
             return converted.Select(pair => pair.Value).ToArray().ToReadOnly();
         }

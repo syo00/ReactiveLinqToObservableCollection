@@ -125,7 +125,7 @@
     <Compile Include="Impl\Connectable\AnonymousConnectableObservable.cs" />
     <Compile Include="Impl\Connectable\ConnectableCollectionStatuses.cs" />
     <Compile Include="Impl\DelegationCollectionStatuses.cs" />
-    <Compile Include="Impl\DelegationCollectionStatuses2.cs" />
+    <Compile Include="Impl\DelegationObservableCollectionCollectionStatuses.cs" />
     <Compile Include="Impl\Grouped\AnonymousGroupedCollectionStatuses.cs" />
     <Compile Include="Impl\Grouped\AnonymousGroupedObservable.cs" />
     <Compile Include="Impl\Grouped\GroupedCollectionStatuses.cs" />
@@ -135,7 +135,6 @@
     <Compile Include="Impl\OrderingComparers\OrderingComparer.cs" />
     <Compile Include="Impl\Producers\AnyProducer.cs" />
     <Compile Include="Impl\Producers\BasicCombineProducer.cs" />
-    <Compile Include="Impl\Producers\BasicCombineProducer2.cs" />
     <Compile Include="Impl\Producers\Box.cs" />
     <Compile Include="Impl\Producers\CastProducer.cs" />
     <Compile Include="Impl\Producers\CombineLatestProducer.cs" />
@@ -159,8 +158,6 @@
     <Compile Include="Impl\Producers\SelectProducer.cs" />
     <Compile Include="Impl\Producers\SimplifyProducer.cs" />
     <Compile Include="Impl\Producers\SkipProducer.cs" />
-    <Compile Include="Impl\Producers\SlimBasicCombineProducer.cs" />
-    <Compile Include="Impl\Producers\SlimCombineProducer.cs" />
     <Compile Include="Impl\Producers\TakeProducer.cs" />
     <Compile Include="Impl\Producers\WhereSelectProducer.cs" />
     <Compile Include="Impl\RecommendedEvent.cs" />
@@ -218,9 +215,11 @@
     <Compile Include="Support\Extractors\ISimpleNotifyCollectionChangedEventExtractor.cs" />
     <Compile Include="Support\Extractors\SimpleNotifyCollectionChangedEventExtractor.cs" />
     <Compile Include="Support\Inspect.cs" />
+    <Compile Include="Support\ReadOnlyTaggedCollection.cs" />
     <Compile Include="Support\SynchronizationChecker.cs" />
     <Compile Include="Support\LightWands.cs" />
     <Compile Include="Support\Reference.cs" />
+    <Compile Include="Support\TaggedCollection.cs" />
     <Compile Include="Tagged.cs" />
     <Compile Include="ValueOrEmpty.cs" />
     <Compile Include="_Exceptions\InvalidInformationException.cs" />

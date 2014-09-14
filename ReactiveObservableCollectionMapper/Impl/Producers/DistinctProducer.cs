@@ -104,16 +104,14 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             return null;
         }
 
-        IReadOnlyList<Tagged<T>> InitialStateAndReset(IReadOnlyList<Tagged<T>> items)
+        IReadOnlyList<T> InitialStateAndReset(IReadOnlyList<T> items)
         {
             Contract.Requires<ArgumentNullException>(items != null);
-            Contract.Requires<ArgumentException>(Contract.ForAll(items, item => item != null));
-            Contract.Ensures(Contract.Result<IReadOnlyList<Tagged<T>>>() != null);
-            Contract.Ensures(Contract.ForAll(Contract.Result<IReadOnlyList<Tagged<T>>>(), item => item != null));
+            Contract.Ensures(Contract.Result<IReadOnlyList<T>>() != null);
 
             valuesCount.Clear();
             return items
-                .Where(i => AddItem(i) != null)
+                .Where(i => AddItem(new Tagged<T>(i)) != null)
                 .ToArray()
                 .ToReadOnly();
         }

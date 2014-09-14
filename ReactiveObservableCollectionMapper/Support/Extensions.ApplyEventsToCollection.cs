@@ -592,9 +592,9 @@ namespace Kirinji.LinqToObservableCollection.Support
             }
         }
 
-        public static SimpleNotifyCollectionChangedEvent<T> ApplySimpleChangeEvent<T>(this IList<Tagged<T>> collection, SimpleNotifyCollectionChangedEvent<T> e, bool checkRemovingItemsEquality = false)
+        public static SimpleNotifyCollectionChangedEvent<T> ApplySimpleChangeEvent<T>(this TaggedCollection<T> source, SimpleNotifyCollectionChangedEvent<T> e, bool checkRemovingItemsEquality = false)
         {
-            Contract.Requires<ArgumentNullException>(collection != null);
+            Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(e != null);
             Contract.Ensures(Contract.Result<SimpleNotifyCollectionChangedEvent<T>>() != null);
 
@@ -602,8 +602,8 @@ namespace Kirinji.LinqToObservableCollection.Support
             {
                 case SimpleNotifyCollectionChangedEventAction.InitialState:
                     {
-                        collection.Clear();
-                        collection.AddRange(e.InitialStateOrReset);
+                        source.Clear();
+                        source.AddRange(e.InitialStateOrReset);
 
                         return e;
                     }
@@ -617,7 +617,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                             {
                                 try
                                 {
-                                    collection.Insert(i.Index, i.Item);
+                                    source.Insert(i.Index, i.Item);
                                 }
                                 catch (IndexOutOfRangeException)
                                 {
@@ -634,7 +634,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                                 Tagged<T> removing;
                                 try
                                 {
-                                    removing = collection[i.Index];
+                                    removing = source[i.Index];
                                 }
                                 catch (IndexOutOfRangeException)
                                 {
@@ -650,7 +650,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                                     throw new InvalidInformationException<T>(InvalidInformationExceptionType.InvalidItem, e);
                                 }
 
-                                collection.RemoveAt(i.Index);
+                                source.RemoveAt(i.Index);
                                 result.Add(new AddedOrRemovedUnit<T>(AddOrRemoveUnitType.Remove, removing, i.Index));
                             }
                         }
@@ -659,8 +659,8 @@ namespace Kirinji.LinqToObservableCollection.Support
                     }
                 case SimpleNotifyCollectionChangedEventAction.Reset:
                     {
-                        collection.Clear();
-                        collection.AddRange(e.InitialStateOrReset);
+                        source.Clear();
+                        source.AddRange(e.InitialStateOrReset);
 
                         return e;
                     }
@@ -669,17 +669,17 @@ namespace Kirinji.LinqToObservableCollection.Support
             }
         }
 
-        public static void ApplySimpleChangeEventWithoutTag<T>(this IList<T> collection, SimpleNotifyCollectionChangedEvent<T> e)
+        public static void ApplySimpleChangeEventWithoutTag<T>(this IList<T> source, SimpleNotifyCollectionChangedEvent<T> e)
         {
-            Contract.Requires<ArgumentNullException>(collection != null);
+            Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(e != null);
 
             switch (e.Action)
             {
                 case SimpleNotifyCollectionChangedEventAction.InitialState:
                     {
-                        collection.Clear();
-                        collection.AddRange(e.InitialStateOrReset.Select(tagged => tagged.Item));
+                        source.Clear();
+                        source.AddRange(e.InitialStateOrReset);
 
                         return;
                     }
@@ -691,7 +691,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                             {
                                 try
                                 {
-                                    collection.Insert(i.Index, i.Item.Item);
+                                    source.Insert(i.Index, i.Item.Item);
                                 }
                                 catch (IndexOutOfRangeException)
                                 {
@@ -706,7 +706,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                             {
                                 try
                                 {
-                                    collection.RemoveAt(i.Index);
+                                    source.RemoveAt(i.Index);
                                 }
                                 catch (IndexOutOfRangeException)
                                 {
@@ -723,8 +723,8 @@ namespace Kirinji.LinqToObservableCollection.Support
                     }
                 case SimpleNotifyCollectionChangedEventAction.Reset:
                     {
-                        collection.Clear();
-                        collection.AddRange(e.InitialStateOrReset.Select(tagged => tagged.Item));
+                        source.Clear();
+                        source.AddRange(e.InitialStateOrReset);
 
                         return;
                     }
@@ -733,17 +733,17 @@ namespace Kirinji.LinqToObservableCollection.Support
             }
         }
 
-        public static void ApplySlimSimpleChangeEvent<T>(this IList<Tagged<T>> collection, SlimSimpleNotifyCollectionChangedEvent<T> e)
+        public static void ApplySlimSimpleChangeEvent<T>(this TaggedCollection<T> source, SlimSimpleNotifyCollectionChangedEvent<T> e)
         {
-            Contract.Requires<ArgumentNullException>(collection != null);
+            Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(e != null);
 
             switch (e.Action)
             {
                 case SlimSimpleNotifyCollectionChangedEventAction.InitialState:
                     {
-                        collection.Clear();
-                        collection.AddRange(e.InitialStateOrReset);
+                        source.Clear();
+                        source.AddRange(e.InitialStateOrReset);
 
                         return;
                     }
@@ -755,7 +755,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                             {
                                 try
                                 {
-                                    collection.Insert(i.Index, i.Item);
+                                    source.Insert(i.Index, i.Item);
                                 }
                                 catch (IndexOutOfRangeException)
                                 {
@@ -770,7 +770,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                             {
                                 try
                                 {
-                                    collection.RemoveAt(i.Index);
+                                    source.RemoveAt(i.Index);
                                 }
                                 catch (IndexOutOfRangeException)
                                 {
@@ -787,8 +787,8 @@ namespace Kirinji.LinqToObservableCollection.Support
                     }
                 case SlimSimpleNotifyCollectionChangedEventAction.Reset:
                     {
-                        collection.Clear();
-                        collection.AddRange(e.InitialStateOrReset);
+                        source.Clear();
+                        source.AddRange(e.InitialStateOrReset);
 
                         return;
                     }
@@ -797,17 +797,17 @@ namespace Kirinji.LinqToObservableCollection.Support
             }
         }
 
-        public static void ApplySlimSimpleChangeEventWithoutTag<T>(this IList<T> collection, SlimSimpleNotifyCollectionChangedEvent<T> e)
+        public static void ApplySlimSimpleChangeEventWithoutTag<T>(this IList<T> source, SlimSimpleNotifyCollectionChangedEvent<T> e)
         {
-            Contract.Requires<ArgumentNullException>(collection != null);
+            Contract.Requires<ArgumentNullException>(source != null);
             Contract.Requires<ArgumentNullException>(e != null);
 
             switch (e.Action)
             {
                 case SlimSimpleNotifyCollectionChangedEventAction.InitialState:
                     {
-                        collection.Clear();
-                        collection.AddRange(e.InitialStateOrReset.Select(tagged => tagged.Item));
+                        source.Clear();
+                        source.AddRange(e.InitialStateOrReset);
 
                         return;
                     }
@@ -819,7 +819,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                             {
                                 try
                                 {
-                                    collection.Insert(i.Index, i.Item.Item);
+                                    source.Insert(i.Index, i.Item.Item);
                                 }
                                 catch (IndexOutOfRangeException)
                                 {
@@ -834,7 +834,7 @@ namespace Kirinji.LinqToObservableCollection.Support
                             {
                                 try
                                 {
-                                    collection.RemoveAt(i.Index);
+                                    source.RemoveAt(i.Index);
                                 }
                                 catch (IndexOutOfRangeException)
                                 {
@@ -851,8 +851,8 @@ namespace Kirinji.LinqToObservableCollection.Support
                     }
                 case SlimSimpleNotifyCollectionChangedEventAction.Reset:
                     {
-                        collection.Clear();
-                        collection.AddRange(e.InitialStateOrReset.Select(tagged => tagged.Item));
+                        source.Clear();
+                        source.AddRange(e.InitialStateOrReset);
 
                         return;
                     }
