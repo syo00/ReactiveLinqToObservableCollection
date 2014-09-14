@@ -12,7 +12,7 @@ using System.Reactive.Concurrency;
 namespace Kirinji.LinqToObservableCollection.Impl.Producers
 {
     // results are not ordered and not distincted like Enumerable.Except
-    class ExceptProducer<T, TSecond> : CombineProducer2<T, TSecond, T>
+    class ExceptProducer<T, TSecond> : CombineProducer<T, TSecond, NotifyCollectionChangedEventObject<T>>
     {
         readonly TaggedCollection<Item> currentItems = new TaggedCollection<Item>();
 

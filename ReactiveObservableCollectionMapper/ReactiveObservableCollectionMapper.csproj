@@ -156,6 +156,7 @@
     <Compile Include="Impl\Producers\ProducerObserver.cs" />
     <Compile Include="Impl\Producers\ReverseProducer.cs" />
     <Compile Include="Impl\Producers\SelectProducer.cs" />
+    <Compile Include="Impl\Producers\SequenceEqualProducer.cs" />
     <Compile Include="Impl\Producers\SimplifyProducer.cs" />
     <Compile Include="Impl\Producers\SkipProducer.cs" />
     <Compile Include="Impl\Producers\TakeProducer.cs" />

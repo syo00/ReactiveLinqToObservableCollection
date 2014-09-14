@@ -207,5 +207,15 @@ namespace Kirinji.LinqToObservableCollection
                         .Subscribe();
                 });
         }
+
+        public static IObservable<bool> SequenceEqual<TSource, TSecond>(this ICollectionStatuses<TSource> source, ICollectionStatuses<TSecond> second, Func<TSource, TSecond, bool> comparer)
+        {
+            Contract.Requires<ArgumentNullException>(source != null);
+            Contract.Requires<ArgumentNullException>(second != null);
+            Contract.Requires<ArgumentNullException>(comparer != null);
+            Contract.Ensures(Contract.Result<IObservable<bool>>() != null);
+
+            return ProducerObservable.Create(() => new SequenceEqualProducer<TSource, TSecond>(source.ToInstance(), second.ToInstance(), comparer));
+        }
     }
 }

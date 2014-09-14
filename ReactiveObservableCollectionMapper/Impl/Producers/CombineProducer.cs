@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Kirinji.LinqToObservableCollection.Impl.Producers
 {
-    [ContractClass(typeof(CombineProducerContract2<,,>))]
-    abstract class CombineProducer2<TSource1, TSource2, T> : BasicCombineProducer<TSource1, TSource2, NotifyCollectionChangedEventObject<T>>
+    [ContractClass(typeof(CombineProducerContract<,,>))]
+    abstract class CombineProducer<TSource1, TSource2, T> : BasicCombineProducer<TSource1, TSource2, T>
     {
-        protected CombineProducer2(CollectionStatuses<TSource1> leftSource, CollectionStatuses<TSource2> rightSource, IReadOnlyCollection<SchedulingAndThreading> schedulingAndThreading)
+        protected CombineProducer(CollectionStatuses<TSource1> leftSource, CollectionStatuses<TSource2> rightSource, IReadOnlyCollection<SchedulingAndThreading> schedulingAndThreading)
             : base(leftSource, rightSource, schedulingAndThreading)
         {
             Contract.Requires<ArgumentNullException>(leftSource != null);
@@ -20,17 +20,17 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             Contract.Requires<ArgumentException>(Contract.ForAll(schedulingAndThreading, x => x != null));
         }
 
-        protected abstract IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertInitialState(IReadOnlyList<TSource1> initialLeftCollection, IReadOnlyList<TSource2> initialRightCollection);
+        protected abstract IEnumerable<T> ConvertInitialState(IReadOnlyList<TSource1> initialLeftCollection, IReadOnlyList<TSource2> initialRightCollection);
 
-        protected abstract IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertLeftChanged(NotifyCollectionChangedEventObject<TSource1> leftEvent);
+        protected abstract IEnumerable<T> ConvertLeftChanged(NotifyCollectionChangedEventObject<TSource1> leftEvent);
 
-        protected abstract IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertRightChanged(NotifyCollectionChangedEventObject<TSource2> rightEvent);
+        protected abstract IEnumerable<T> ConvertRightChanged(NotifyCollectionChangedEventObject<TSource2> rightEvent);
 
-        protected abstract IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertLeftReset(IReadOnlyList<TSource1> leftReset);
+        protected abstract IEnumerable<T> ConvertLeftReset(IReadOnlyList<TSource1> leftReset);
 
-        protected abstract IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertRightReset(IReadOnlyList<TSource2> rightReset);
+        protected abstract IEnumerable<T> ConvertRightReset(IReadOnlyList<TSource2> rightReset);
 
-        protected sealed override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertLeftEvent(NotifyCollectionChangedEventObject<TSource1> e)
+        protected sealed override IEnumerable<T> ConvertLeftEvent(NotifyCollectionChangedEventObject<TSource1> e)
         {
             if (!IsRightInitialStateArrived)
             {
@@ -61,7 +61,7 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
             }
         }
 
-        protected sealed override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertRightEvent(NotifyCollectionChangedEventObject<TSource2> e)
+        protected sealed override IEnumerable<T> ConvertRightEvent(NotifyCollectionChangedEventObject<TSource2> e)
         {
             if (!IsLeftInitialStateArrived)
             {
@@ -93,52 +93,52 @@ namespace Kirinji.LinqToObservableCollection.Impl.Producers
         }
     }
 
-    [ContractClassFor(typeof(CombineProducer2<,,>))]
-    abstract class CombineProducerContract2<TSource1, TSource2, T> : CombineProducer2<TSource1, TSource2, T>
+    [ContractClassFor(typeof(CombineProducer<,,>))]
+    abstract class CombineProducerContract<TSource1, TSource2, T> : CombineProducer<TSource1, TSource2, T>
     {
-        private CombineProducerContract2()
+        private CombineProducerContract()
             : base(null, null, null)
         {
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertInitialState(IReadOnlyList<TSource1> initialLeftCollection, IReadOnlyList<TSource2> initialRightCollection)
+        protected override IEnumerable<T> ConvertInitialState(IReadOnlyList<TSource1> initialLeftCollection, IReadOnlyList<TSource2> initialRightCollection)
         {
             Contract.Requires<ArgumentNullException>(initialLeftCollection != null);
             Contract.Requires<ArgumentNullException>(initialRightCollection != null);
-            Contract.Ensures(Contract.Result<IEnumerable<NotifyCollectionChangedEventObject<T>>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertLeftChanged(NotifyCollectionChangedEventObject<TSource1> leftEvent)
+        protected override IEnumerable<T> ConvertLeftChanged(NotifyCollectionChangedEventObject<TSource1> leftEvent)
         {
             Contract.Requires<ArgumentNullException>(leftEvent != null);
-            Contract.Ensures(Contract.Result<IEnumerable<NotifyCollectionChangedEventObject<T>>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertRightChanged(NotifyCollectionChangedEventObject<TSource2> rightEvent)
+        protected override IEnumerable<T> ConvertRightChanged(NotifyCollectionChangedEventObject<TSource2> rightEvent)
         {
             Contract.Requires<ArgumentNullException>(rightEvent != null);
-            Contract.Ensures(Contract.Result<IEnumerable<NotifyCollectionChangedEventObject<T>>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertLeftReset(IReadOnlyList<TSource1> leftReset)
+        protected override IEnumerable<T> ConvertLeftReset(IReadOnlyList<TSource1> leftReset)
         {
             Contract.Requires<ArgumentNullException>(leftReset != null);
-            Contract.Ensures(Contract.Result<IEnumerable<NotifyCollectionChangedEventObject<T>>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<NotifyCollectionChangedEventObject<T>> ConvertRightReset(IReadOnlyList<TSource2> rightReset)
+        protected override IEnumerable<T> ConvertRightReset(IReadOnlyList<TSource2> rightReset)
         {
             Contract.Requires<ArgumentNullException>(rightReset != null);
-            Contract.Ensures(Contract.Result<IEnumerable<NotifyCollectionChangedEventObject<T>>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
             throw new NotImplementedException();
         }

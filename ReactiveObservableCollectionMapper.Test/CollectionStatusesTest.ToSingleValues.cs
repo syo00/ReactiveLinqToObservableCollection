@@ -757,5 +757,178 @@ namespace Kirinji.LinqToObservableCollection.Test
 
             AssertEx.Catch<Exception>(() => source.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new IObservable<string>[] { subject1 })));
         }
+
+        [TestMethod]
+        public void SequenceEqualTest()
+        {
+            // OnNext & OnCompleted(subject1 -> subject2) test
+            {
+                var subject1 = new Subject<INotifyCollectionChangedEvent<int>>();
+                var subject2 = new Subject<INotifyCollectionChangedEvent<int>>();
+                var valuesHistory = new List<bool>();
+                Exception error = null;
+                bool completed = false;
+
+                subject1
+                    .ToStatuses(true)
+                    .SequenceEqual(subject2.ToStatuses(true), (x, y) => x == y)
+                    .Subscribe(valuesHistory.Add, ex => error = ex, () => completed = true);
+                valuesHistory.Is();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new int[] { }));
+                valuesHistory.Is();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateAddedEvent(new[] { 1, 2 }, 0));
+                valuesHistory.Is();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new[] { 1, 2 }));
+                valuesHistory.Single().IsTrue();
+                valuesHistory.Clear();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateAddedEvent(new[] { 3, 4 }, 2));
+                valuesHistory.Single().IsFalse();
+                valuesHistory.Clear();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateRemovedEvent(new[] { 3, 4 }, 2));
+                valuesHistory.Single().IsTrue();
+                valuesHistory.Clear();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateMovedEvent(new[] { 1 }, 0, 1));
+                valuesHistory.Single().IsFalse();
+                valuesHistory.Clear();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateMovedEvent(new[] { 1 }, 1, 0));
+                valuesHistory.Single().IsTrue();
+                valuesHistory.Clear();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateReplacedEvent(new[] { 1 }, new[] { 2 }, 0));
+                valuesHistory.Single().IsFalse();
+                valuesHistory.Clear();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateReplacedEvent(new[] { 2 }, new[] { 1 }, 0));
+                valuesHistory.Single().IsTrue();
+                valuesHistory.Clear();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateResetEvent(new[] { 1 }));
+                valuesHistory.Single().IsFalse();
+                valuesHistory.Clear();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateResetEvent(new[] { 1, 2 }));
+                valuesHistory.Single().IsTrue();
+                valuesHistory.Clear();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateAddedEvent(new[] { 3, 4 }, 2));
+                valuesHistory.Single().IsFalse();
+                valuesHistory.Clear();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateRemovedEvent(new[] { 3, 4 }, 2));
+                valuesHistory.Single().IsTrue();
+                valuesHistory.Clear();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateMovedEvent(new[] { 1 }, 0, 1));
+                valuesHistory.Single().IsFalse();
+                valuesHistory.Clear();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateMovedEvent(new[] { 1 }, 1, 0));
+                valuesHistory.Single().IsTrue();
+                valuesHistory.Clear();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateReplacedEvent(new[] { 1 }, new[] { 2 }, 0));
+                valuesHistory.Single().IsFalse();
+                valuesHistory.Clear();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateReplacedEvent(new[] { 2 }, new[] { 1 }, 0));
+                valuesHistory.Single().IsTrue();
+                valuesHistory.Clear();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateResetEvent(new[] { 1 }));
+                valuesHistory.Single().IsFalse();
+                valuesHistory.Clear();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateResetEvent(new[] { 1, 2 }));
+                valuesHistory.Single().IsTrue();
+                valuesHistory.Clear();
+
+                subject1.OnCompleted();
+                completed.IsFalse();
+
+                subject2.OnCompleted();
+                completed.IsTrue();
+                error.IsNull();
+            }
+
+            // OnNext & OnCompleted(subject2 -> subject1) test
+            {
+                var subject1 = new Subject<INotifyCollectionChangedEvent<int>>();
+                var subject2 = new Subject<INotifyCollectionChangedEvent<int>>();
+                var valuesHistory = new List<bool>();
+                Exception error = null;
+                bool completed = false;
+
+                subject1
+                    .ToStatuses(true)
+                    .SequenceEqual(subject2.ToStatuses(true), (x, y) => x == y)
+                    .Subscribe(valuesHistory.Add, ex => error = ex, () => completed = true);
+                valuesHistory.Is();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new int[] { }));
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new int[] { }));
+
+                subject2.OnCompleted();
+                completed.IsFalse();
+
+                subject1.OnCompleted();
+                completed.IsTrue();
+                error.IsNull();
+            }
+
+            // OnError test(subject1)
+            {
+                var subject1 = new Subject<INotifyCollectionChangedEvent<int>>();
+                var subject2 = new Subject<INotifyCollectionChangedEvent<int>>();
+                var valuesHistory = new List<bool>();
+                Exception error = null;
+                bool completed = false;
+
+                subject1
+                    .ToStatuses(true)
+                    .SequenceEqual(subject2.ToStatuses(true), (x, y) => x == y)
+                    .Subscribe(valuesHistory.Add, ex => error = ex, () => completed = true);
+                valuesHistory.Is();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new int[] { }));
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new int[] { }));
+
+                subject1.OnError(new BadImageFormatException());
+                error.IsInstanceOf<BadImageFormatException>();
+                completed.IsFalse();
+
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new int[] { }));
+            }
+
+            // OnError test(subject2)
+            {
+                var subject1 = new Subject<INotifyCollectionChangedEvent<int>>();
+                var subject2 = new Subject<INotifyCollectionChangedEvent<int>>();
+                var valuesHistory = new List<bool>();
+                Exception error = null;
+                bool completed = false;
+
+                subject1
+                    .ToStatuses(true)
+                    .SequenceEqual(subject2.ToStatuses(true), (x, y) => x == y)
+                    .Subscribe(valuesHistory.Add, ex => error = ex, () => completed = true);
+                valuesHistory.Is();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new int[] { }));
+                subject2.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new int[] { }));
+
+                subject2.OnError(new BadImageFormatException());
+                error.IsInstanceOf<BadImageFormatException>();
+                completed.IsFalse();
+
+                subject1.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new int[] { }));
+            }
+        }
     }
 }
