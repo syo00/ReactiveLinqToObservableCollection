@@ -652,5 +652,18 @@ namespace Kirinji.LinqToObservableCollection
             return source
                 .Where(x => predicate(x).StartWith(initialPredicate(x)));
         }
+
+        public static ICollectionStatuses<TResult> Zip<TSource, TSecond, TResult>(this ICollectionStatuses<TSource> source, ICollectionStatuses<TSecond> second, Func<TSource, TSecond, TResult> converter)
+        {
+            Contract.Requires<ArgumentNullException>(source != null);
+            Contract.Requires<ArgumentNullException>(second != null);
+            Contract.Requires<ArgumentNullException>(converter != null);
+            Contract.Ensures(Contract.Result<ICollectionStatuses<TResult>>() != null);
+
+            return ProducerObservable.Create(() => new ZipFilledProducer<TSource, TSecond>(source.ToInstance(), second.ToInstance()))
+                .ToStatuses()
+                .Where(z => z.Value1.HasValue && z.Value2.HasValue)
+                .Select(z => converter(z.Value1.Value, z.Value2.Value));
+        }
     }
 }

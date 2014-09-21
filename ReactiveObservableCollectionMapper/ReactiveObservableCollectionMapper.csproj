@@ -161,6 +161,7 @@
     <Compile Include="Impl\Producers\SkipProducer.cs" />
     <Compile Include="Impl\Producers\TakeProducer.cs" />
     <Compile Include="Impl\Producers\WhereSelectProducer.cs" />
+    <Compile Include="Impl\Producers\ZipFilledProducer.cs" />
     <Compile Include="Impl\RecommendedEvent.cs" />
     <Compile Include="Impl\RecommendedEventType.cs" />
     <Compile Include="Impl\ReverseCollectionStatuses.cs" />

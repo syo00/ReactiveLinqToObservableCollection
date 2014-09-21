@@ -1692,5 +1692,187 @@ namespace Kirinji.LinqToObservableCollection.Test
             errorsHistory.Is();
             completed.IsFalse();
         }
+
+        [TestMethod]
+        public void ZipTest()
+        {
+            {
+                var subject = new Subject<INotifyCollectionChangedEvent<string>>();
+                var secondSubject = new Subject<INotifyCollectionChangedEvent<string>>();
+                var valuesHistory = new List<INotifyCollectionChangedEvent<string>>();
+                Exception error = null;
+                var completed = false;
+
+                subject
+                    .ToStatuses(true)
+                    .Zip(secondSubject.ToStatuses(true), (x, y) => x + "+" + y)
+                    .InitialStateAndChanged
+                    .Subscribe(valuesHistory.Add, ex => error = ex, () => completed = true);
+                valuesHistory.Is();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new[] { "apple" }));
+                valuesHistory.Is();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateAddedEvent(new[] { "blueberry" }, 1));
+                valuesHistory.Is();
+
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new[] { "pie" }));
+                valuesHistory.Single().InitialState.Items.Is("apple+pie"); // ["apple+pie", "blueberry+()"]
+                valuesHistory.Clear();
+
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateAddedEvent(new[] { "jam", "juice", "yogurt", "marmalade" }, 1)); // ["apple+pie", "blueberry+jam", "()+juice", "()+yogurt", "()+marmalade"]
+                valuesHistory.Single().Added.StartingIndex.Is(1);
+                valuesHistory.Single().Added.Items.Is("blueberry+jam");
+                valuesHistory.Clear();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateAddedEvent(new[] { "cherry", "orange" }, 0)); // ["cherry+pie", "orange+jam", "apple+juice", "blueberry+yogurt", "()+marmalade"]
+                valuesHistory.Single().Replaced.StartingIndex.Is(0);
+                valuesHistory.Single().Replaced.OldItems.Is("apple+pie", "blueberry+jam");
+                valuesHistory.Single().Replaced.NewItems.Is("cherry+pie", "orange+jam", "apple+juice", "blueberry+yogurt");
+                valuesHistory.Clear();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateRemovedEvent(new[] { "cherry", "orange" }, 0)); // ["apple+pie", "blueberry+jam", "()+juice", "()+yogurt", "()+marmalade"]
+                valuesHistory.Single().Replaced.StartingIndex.Is(0);
+                valuesHistory.Single().Replaced.OldItems.Is("cherry+pie", "orange+jam", "apple+juice", "blueberry+yogurt");
+                valuesHistory.Single().Replaced.NewItems.Is("apple+pie", "blueberry+jam");
+                valuesHistory.Clear();
+
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateRemovedEvent(new[] { "jam", "juice", "yogurt", "marmalade" }, 1)); // ["apple+pie", "blueberry+()"]
+                valuesHistory.Single().Removed.StartingIndex.Is(1);
+                valuesHistory.Single().Removed.Items.Is("blueberry+jam");
+                valuesHistory.Clear();
+
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateReplacedEvent(new[] { "pie" }, new[] { "seed", "stream", "fruit" }, 0)); // ["apple+seed", "blueberry+stream", "()+fruit"]
+                valuesHistory.Single().Replaced.StartingIndex.Is(0);
+                valuesHistory.Single().Replaced.OldItems.Is("apple+pie");
+                valuesHistory.Single().Replaced.NewItems.Is("apple+seed", "blueberry+stream");
+                valuesHistory.Clear();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateReplacedEvent(new[] { "blueberry" }, new[] { "redberry", "grape", "blackberry" }, 1)); // ["apple+seed", "redberry+stream", "grape+fruit", "blackberry+()"]
+                valuesHistory.Single().Replaced.StartingIndex.Is(1);
+                valuesHistory.Single().Replaced.OldItems.Is("blueberry+stream");
+                valuesHistory.Single().Replaced.NewItems.Is("redberry+stream", "grape+fruit");
+                valuesHistory.Clear();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateMovedEvent(new[] { "apple", "redberry" }, 0, 2)); // ["grape+seed", "blackberry+stream", "apple+fruit", "redberry+()"]
+                valuesHistory.Single().Replaced.StartingIndex.Is(0);
+                valuesHistory.Single().Replaced.OldItems.Is("apple+seed", "redberry+stream", "grape+fruit");
+                valuesHistory.Single().Replaced.NewItems.Is("grape+seed", "blackberry+stream", "apple+fruit");
+                valuesHistory.Clear();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateMovedEvent(new[] { "apple", "redberry" }, 2, 0)); // ["apple+seed", "redberry+stream", "grape+fruit", "blackberry+()"]
+                valuesHistory.Single().Replaced.StartingIndex.Is(0);
+                valuesHistory.Single().Replaced.OldItems.Is("grape+seed", "blackberry+stream", "apple+fruit");
+                valuesHistory.Single().Replaced.NewItems.Is("apple+seed", "redberry+stream", "grape+fruit");
+                valuesHistory.Clear();
+
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateMovedEvent(new[] { "seed", "stream" }, 0, 1)); // ["apple+fruit", "redberry+seed", "grape+stream", "blackberry+()"]
+                valuesHistory.Single().Replaced.StartingIndex.Is(0);
+                valuesHistory.Single().Replaced.OldItems.Is("apple+seed", "redberry+stream", "grape+fruit");
+                valuesHistory.Single().Replaced.NewItems.Is("apple+fruit", "redberry+seed", "grape+stream");
+                valuesHistory.Clear();
+
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateMovedEvent(new[] { "seed", "stream" }, 1, 0)); // ["apple+seed", "redberry+stream", "grape+fruit", "blackberry+()"]
+                valuesHistory.Single().Replaced.StartingIndex.Is(0);
+                valuesHistory.Single().Replaced.OldItems.Is("apple+fruit", "redberry+seed", "grape+stream");
+                valuesHistory.Single().Replaced.NewItems.Is("apple+seed", "redberry+stream", "grape+fruit");
+                valuesHistory.Clear();
+
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateResetEvent(new[] { "juice", "farm", "wine", "phone", "bar" })); // ["apple+juice", "redberry+farm", "grape+wine", "blackberry+phone", "()+bar"]
+                valuesHistory.Single().Reset.Items.Is("apple+juice", "redberry+farm", "grape+wine", "blackberry+phone");
+                valuesHistory.Clear();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateResetEvent(new[] { "lotus", "rice", "install", "windows", "foo", "hoge", "fuga" })); // ["apple+juice", "redberry+farm", "grape+wine", "windows+phone", "foo+bar", "hoge+()", "fuga+()"]
+                valuesHistory.Single().Reset.Items.Is("lotus+juice", "rice+farm", "install+wine", "windows+phone", "foo+bar");
+                valuesHistory.Clear();
+
+                subject.OnCompleted();
+                completed.IsFalse();
+
+                secondSubject.OnCompleted();
+                valuesHistory.Is();
+                error.IsNull();
+                completed.IsTrue();
+            }
+
+            {
+                var subject = new Subject<INotifyCollectionChangedEvent<string>>();
+                var secondSubject = new Subject<INotifyCollectionChangedEvent<string>>();
+                var valuesHistory = new List<INotifyCollectionChangedEvent<string>>();
+                Exception error = null;
+                var completed = false;
+
+                subject
+                    .ToStatuses(true)
+                    .Zip(secondSubject.ToStatuses(true), (x, y) => x + "+" + y)
+                    .InitialStateAndChanged
+                    .Subscribe(valuesHistory.Add, ex => error = ex, () => completed = true);
+                valuesHistory.Is();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new[] { "apple" }));
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new[] { "pie" }));
+                valuesHistory.Clear();
+
+                secondSubject.OnCompleted();
+                completed.IsFalse();
+
+                subject.OnCompleted();
+                valuesHistory.Is();
+                error.IsNull();
+                completed.IsTrue();
+            }
+
+            {
+                var subject = new Subject<INotifyCollectionChangedEvent<string>>();
+                var secondSubject = new Subject<INotifyCollectionChangedEvent<string>>();
+                var valuesHistory = new List<INotifyCollectionChangedEvent<string>>();
+                Exception error = null;
+                var completed = false;
+
+                subject
+                    .ToStatuses(true)
+                    .Zip(secondSubject.ToStatuses(true), (x, y) => x + "+" + y)
+                    .InitialStateAndChanged
+                    .Subscribe(valuesHistory.Add, ex => error = ex, () => completed = true);
+                valuesHistory.Is();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new[] { "apple" }));
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new[] { "pie" }));
+                valuesHistory.Clear();
+
+                subject.OnError(new BadImageFormatException());
+                error.IsInstanceOf<BadImageFormatException>();
+                completed.IsFalse();
+                valuesHistory.Is();
+
+                secondSubject.OnError(new DivideByZeroException());
+            }
+
+            {
+                var subject = new Subject<INotifyCollectionChangedEvent<string>>();
+                var secondSubject = new Subject<INotifyCollectionChangedEvent<string>>();
+                var valuesHistory = new List<INotifyCollectionChangedEvent<string>>();
+                Exception error = null;
+                var completed = false;
+
+                subject
+                    .ToStatuses(true)
+                    .Zip(secondSubject.ToStatuses(true), (x, y) => x + "+" + y)
+                    .InitialStateAndChanged
+                    .Subscribe(valuesHistory.Add, ex => error = ex, () => completed = true);
+                valuesHistory.Is();
+
+                subject.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new[] { "apple" }));
+                secondSubject.OnNext(NotifyCollectionChangedEvent.CreateInitialStateEvent(new[] { "pie" }));
+                valuesHistory.Clear();
+
+                secondSubject.OnError(new BadImageFormatException());
+                error.IsInstanceOf<BadImageFormatException>();
+                completed.IsFalse();
+                valuesHistory.Is();
+
+                subject.OnError(new DivideByZeroException());
+            }
+        }
     }
 }
