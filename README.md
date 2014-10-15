@@ -1,4 +1,4 @@
-Reactive ObservableCollection Mapper
+Reactive LINQ to ObservableCollection 
 ====================================
 This library provides quite easy way to **convert a ObservableCollection/ReadOnlyObservableCollection into new ReadOnlyObservableCollection by using LINQ to Objects and Reactive Extensions style methods**.
 
