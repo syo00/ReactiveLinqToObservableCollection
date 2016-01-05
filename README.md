@@ -1,3 +1,10 @@
+Important
+====================================
+*This source has significant problems and I am writing a new code. I will publish it when it becomes practically.*
+
+*このソースは構造に根本的な欠陥があるので新しく作り直します。新しいコードとファイルはある程度形になったら公開します。*
+
+
 Reactive LINQ to ObservableCollection 
 ====================================
 This library provides quite easy way to **convert a ObservableCollection/ReadOnlyObservableCollection into new ReadOnlyObservableCollection by using LINQ to Objects and Reactive Extensions style methods**.
